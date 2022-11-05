@@ -179,7 +179,7 @@ class Stream implements StreamInterface
             return null;
         }
         $stats = fstat($this->stream);
-        return array_key_exists('size', $stats) ? $stats['size'] : null;
+        return $stats && array_key_exists('size', $stats) ? $stats['size'] : null;
     }
 
     /**
