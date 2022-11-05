@@ -118,7 +118,7 @@ class StreamFactoryTest extends TestCase
         $resource = 'No, not a resource';
         // This provoke stream implementation to throw exception
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid stream provided");
+        $this->expectExceptionMessage("Invalid stream provided; got type 'string'.");
         $stream = $factory->createStreamFromResource($resource);
     }
 }

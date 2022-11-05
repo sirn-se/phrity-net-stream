@@ -90,7 +90,7 @@ class StreamTest extends TestCase
         (new ErrorHandler())->withAll(function () use ($stream) {
             $this->assertEquals("", "{$stream}");
         }, function ($exceptions, $result) {
-            $this->assertEquals('Stream is detached', $exceptions[0]->getMessage());
+            $this->assertEquals('Stream is detached.', $exceptions[0]->getMessage());
         }, E_USER_WARNING);
     }
 
@@ -118,7 +118,7 @@ class StreamTest extends TestCase
         $factory = new StreamFactory();
         $stream = $factory->createStream('This is a temporary test stream');
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Failed to seek");
+        $this->expectExceptionMessage("Failed to seek.");
         $stream->seek(-1);
     }
 
@@ -129,7 +129,7 @@ class StreamTest extends TestCase
 
         $stream->close();
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached");
+        $this->expectExceptionMessage("Stream is detached.");
         $stream->tell();
     }
 
@@ -140,7 +140,7 @@ class StreamTest extends TestCase
 
         $stream->close();
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached");
+        $this->expectExceptionMessage("Stream is detached.");
         $stream->read(4);
     }
 
@@ -151,7 +151,7 @@ class StreamTest extends TestCase
 
         $stream->close();
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached");
+        $this->expectExceptionMessage("Stream is detached.");
         $stream->write("Will fail");
     }
 
@@ -162,7 +162,7 @@ class StreamTest extends TestCase
 
         $stream->close();
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached");
+        $this->expectExceptionMessage("Stream is detached.");
         $stream->seek(0);
     }
 
@@ -173,7 +173,7 @@ class StreamTest extends TestCase
 
         $stream->close();
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached");
+        $this->expectExceptionMessage("Stream is detached.");
         $stream->rewind();
     }
 
@@ -184,7 +184,7 @@ class StreamTest extends TestCase
 
         $stream->close();
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached");
+        $this->expectExceptionMessage("Stream is detached.");
         $stream->getContents();
     }
 
@@ -227,7 +227,7 @@ class StreamTest extends TestCase
         $stream = $factory->createStreamFromFile($file, 'r');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not writable");
+        $this->expectExceptionMessage("Stream is not writable.");
         $stream->write("Should fail");
     }
 
@@ -270,7 +270,7 @@ class StreamTest extends TestCase
         $stream = $factory->createStreamFromFile($file, 'w');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not readable");
+        $this->expectExceptionMessage("Stream is not readable.");
         $stream->read(10);
     }
 
@@ -281,7 +281,7 @@ class StreamTest extends TestCase
         $stream = $factory->createStreamFromFile($file, 'w');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not readable");
+        $this->expectExceptionMessage("Stream is not readable.");
         $stream->getContents();
     }
 
@@ -336,21 +336,23 @@ class StreamTest extends TestCase
         $remote = fopen('https://phrity.sirn.se/', 'r');
         $stream = new Stream($remote);
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not seekable");
+        $this->expectExceptionMessage("Stream is not seekable.");
         $stream->seek(0);
     }
 
     public function testConstructNoResource(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid stream provided");
+        $this->expectExceptionMessage("Invalid stream provided; got type 'string'.");
         $stream = new Stream("should fail");
     }
 
     public function testConstructInvalidResource(): void
     {
+        // We need something that is a resouce but not a "stream" resource
+        $resource = stream_context_create([]);
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid stream provided");
-        $stream = new Stream(curl_init());
+        $this->expectExceptionMessage("Invalid stream provided; gor resource type 'stream-context'.");
+        $stream = new Stream($resource);
     }
 }

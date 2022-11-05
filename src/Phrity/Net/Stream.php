@@ -36,11 +36,13 @@ class Stream implements StreamInterface
      */
     public function __construct($stream)
     {
-        if (gettype($stream) !== 'resource') {
-             throw new InvalidArgumentException('Invalid stream provided');
+        $type = gettype($stream);
+        if ($type !== 'resource') {
+             throw new InvalidArgumentException("Invalid stream provided; got type '{$type}'.");
         }
-        if (!in_array(get_resource_type($stream), ['stream', 'persistent stream'])) {
-             throw new InvalidArgumentException('Invalid stream provided');
+        $rtype = get_resource_type($stream);
+        if (!in_array($rtype, ['stream', 'persistent stream'])) {
+             throw new InvalidArgumentException("Invalid stream provided; gor resource type '{$rtype}'.");
         }
         $this->stream = $stream;
         $this->handler = new ErrorHandler();
@@ -112,11 +114,11 @@ class Stream implements StreamInterface
     public function tell(): int
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached.');
         }
         return $this->handler->with(function () {
             return ftell($this->stream);
-        }, new RuntimeException('Failed tell() on stream'));
+        }, new RuntimeException('Failed tell() on stream.'));
     }
 
     /**
@@ -140,14 +142,14 @@ class Stream implements StreamInterface
     public function read($length): string
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached.');
         }
         if (!$this->readable) {
-            throw new RuntimeException('Stream is not readable');
+            throw new RuntimeException('Stream is not readable.');
         }
         return $this->handler->with(function () use ($length) {
             return fread($this->stream, $length);
-        }, new RuntimeException('Failed read() on stream'));
+        }, new RuntimeException('Failed read() on stream.'));
     }
 
     /**
@@ -159,14 +161,14 @@ class Stream implements StreamInterface
     public function write($string): int
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached.');
         }
         if (!$this->writable) {
-            throw new RuntimeException('Stream is not writable');
+            throw new RuntimeException('Stream is not writable.');
         }
         return $this->handler->with(function () use ($string) {
             return fwrite($this->stream, $string);
-        }, new RuntimeException('Failed write() on stream'));
+        }, new RuntimeException('Failed write() on stream.'));
     }
 
     /**
@@ -204,14 +206,14 @@ class Stream implements StreamInterface
     public function seek($offset, $whence = SEEK_SET): void
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached.');
         }
         if (!$this->seekable) {
-            throw new RuntimeException('Stream is not seekable');
+            throw new RuntimeException('Stream is not seekable.');
         }
         $result = fseek($this->stream, $offset, $whence);
         if ($result !== 0) {
-            throw new RuntimeException('Failed to seek');
+            throw new RuntimeException('Failed to seek.');
         }
     }
 
@@ -253,14 +255,14 @@ class Stream implements StreamInterface
     public function getContents(): string
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached.');
         }
         if (!$this->readable) {
-            throw new RuntimeException('Stream is not readable');
+            throw new RuntimeException('Stream is not readable.');
         }
         return $this->handler->with(function () {
             return stream_get_contents($this->stream);
-        }, new RuntimeException('Failed getContents() on stream'));
+        }, new RuntimeException('Failed getContents() on stream.'));
     }
 
     /**
