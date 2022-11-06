@@ -41,8 +41,7 @@ class SocketServer
         if (in_array(substr($uri->getScheme(), 0, 3), self::$internet_schemes)) {
             $address = "{$uri->getScheme()}://{$uri->getAuthority()}";
         } elseif (in_array($uri->getScheme(), self::$unix_schemes)) {
-var_dump($uri->getPath(), "$uri");
-            $address = "{$uri}";
+            $address = "{$uri->getScheme()}://{$uri->getPath()}";
         } else {
             throw new RuntimeException("Could not handle scheme '{$uri->getScheme()}'.");
         }
