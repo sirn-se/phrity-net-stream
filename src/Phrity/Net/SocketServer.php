@@ -25,6 +25,7 @@ class SocketServer
 
     private $handler;
     private $socket;
+    private $blocking = true;
 
     /**
      * Create new socker server instance
@@ -86,9 +87,9 @@ class SocketServer
             return stream_socket_accept($this->socket, $timeout, $peer_name);
         }, function (ErrorException $e) {
             // If non-blocking mode, don't throw error on time out
-echo "blocked: ".json_encode($this->getMetadata('blocked'))."\n";
+echo "blocked: ".json_encode($this->blocking)."\n";
 echo "error: {$e->getMessage()}\n";
-            if ($this->getMetadata('blocked') === false && substr_count($e->getMessage(), 'Operation timed out') > 0) {
+            if (!$this->blocking && substr_count($e->getMessage(), 'Operation timed out') > 0) {
                 return null;
             }
             throw new RuntimeException("Could not accept on socket.");
@@ -115,6 +116,7 @@ echo "error: {$e->getMessage()}\n";
         if (!isset($this->socket)) {
             throw new RuntimeException("Server is closed.");
         }
+        $this->blocking = $enable;
         return stream_set_blocking($this->socket, $enable);
     }
 
