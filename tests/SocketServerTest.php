@@ -14,9 +14,31 @@ use RuntimeException;
 
 class SocketServerTest extends TestCase
 {
-    public function testNonBlockingServer(): void
+    public function testNonBlockingTcpServer(): void
     {
         $uri = new Uri('tcp://0.0.0.0:8000');
+        $server = new SocketServer($uri);
+        $this->assertInstanceOf(SocketServer::class, $server);
+        $this->assertTrue($server->setBlocking(false));
+        $this->assertEquals([
+            'timed_out' => false,
+            'blocked' => false,
+            'eof' => false,
+            'stream_type' => 'tcp_socket/ssl',
+            'mode' => 'r+',
+            'unread_bytes' => 0,
+            'seekable' => false,
+        ], $server->getMetadata());
+        $stream = $server->accept(0);
+        $this->assertNull($stream); // Non-blocking, nothing to accept
+        $server->close();
+        $this->assertNull($server->getMetadata());
+    }
+
+    public function testNonBlockingUnixServer(): void
+    {
+        $this->markTestSkipped('Currently do not support unix Uri:s');
+        $uri = new Uri("unix:///tmp/test.sock");
         $server = new SocketServer($uri);
         $this->assertInstanceOf(SocketServer::class, $server);
         $this->assertTrue($server->setBlocking(false));
@@ -74,5 +96,25 @@ class SocketServerTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Could not accept on socket.");
         $stream = $server->accept(0);
+    }
+
+    public function testAcceptOnClosedError(): void
+    {
+        $uri = new Uri('tcp://0.0.0.0:8000');
+        $server = new SocketServer($uri);
+        $server->close();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Server is closed.");
+        $server->accept();
+    }
+
+    public function testSetBlockingOnClosedError(): void
+    {
+        $uri = new Uri('tcp://0.0.0.0:8000');
+        $server = new SocketServer($uri);
+        $server->close();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Server is closed.");
+        $server->setBlocking(true);
     }
 }

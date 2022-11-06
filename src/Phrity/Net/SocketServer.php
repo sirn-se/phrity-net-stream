@@ -25,7 +25,6 @@ class SocketServer
 
     private $handler;
     private $socket;
-    private $blocking = true;
 
     /**
      * Create new socker server instance
@@ -42,7 +41,8 @@ class SocketServer
         if (in_array(substr($uri->getScheme(), 0, 3), self::$internet_schemes)) {
             $address = "{$uri->getScheme()}://{$uri->getAuthority()}";
         } elseif (in_array($uri->getScheme(), self::$unix_schemes)) {
-            $address = "{$uri->getScheme()}://{$uri->getPath()}";
+var_dump($uri->getPath(), "$uri");
+            $address = "{$uri}";
         } else {
             throw new RuntimeException("Could not handle scheme '{$uri->getScheme()}'.");
         }
@@ -87,10 +87,7 @@ class SocketServer
             return stream_socket_accept($this->socket, $timeout, $peer_name);
         }, function (ErrorException $e) {
             // If non-blocking mode, don't throw error on time out
-echo "blocked1: ".json_encode($this->getMetadata('blocked'))."\n";
-echo "blocked2: ".json_encode($this->blocking)."\n";
-echo "error: {$e->getMessage()}\n";
-            if (!$this->blocking && substr_count($e->getMessage(), 'timed out') > 0) {
+            if ($this->getMetadata('blocked') === false && substr_count($e->getMessage(), 'timed out') > 0) {
                 return null;
             }
             throw new RuntimeException("Could not accept on socket.");
@@ -117,7 +114,6 @@ echo "error: {$e->getMessage()}\n";
         if (!isset($this->socket)) {
             throw new RuntimeException("Server is closed.");
         }
-        $this->blocking = $enable;
         return stream_set_blocking($this->socket, $enable);
     }
 
