@@ -86,8 +86,9 @@ class SocketServer
             return stream_socket_accept($this->socket, $timeout, $peer_name);
         }, function (ErrorException $e) {
             // If non-blocking mode, don't throw error on time out
-            if ($this->getMetadata('blocked') === false
-                && substr_count($e->getMessage(), 'Operation timed out') > 0) {
+echo "blocked: ".json_encode($this->getMetadata('blocked'))."\n";
+echo "error: {$e->getMessage()}\n";
+            if ($this->getMetadata('blocked') === false && substr_count($e->getMessage(), 'Operation timed out') > 0) {
                 return null;
             }
             throw new RuntimeException("Could not accept on socket.");
@@ -136,5 +137,4 @@ class SocketServer
         }
         return $meta;
     }
-
 }
