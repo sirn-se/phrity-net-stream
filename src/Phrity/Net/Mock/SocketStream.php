@@ -5,7 +5,7 @@
  * @package Phrity > Net > Stream
  */
 
-namespace Phrity\Net;
+namespace Phrity\Net\Mock;
 
 /**
  * Net\SocketStream class.

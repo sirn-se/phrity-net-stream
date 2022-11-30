@@ -14,6 +14,13 @@ use RuntimeException;
 
 class SocketServerTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        if (file_exists('/tmp/test.sock')) {
+            unlink('/tmp/test.sock');
+        }
+    }
+
     public function testNonBlockingTcpServer(): void
     {
         $uri = new Uri('tcp://0.0.0.0:8000');
@@ -37,7 +44,6 @@ class SocketServerTest extends TestCase
 
     public function testNonBlockingUnixServer(): void
     {
-        $this->markTestSkipped('Currently do not support unix Uri:s');
         $uri = new Uri("unix:///tmp/test.sock");
         $server = new SocketServer($uri);
         $this->assertInstanceOf(SocketServer::class, $server);
@@ -46,7 +52,7 @@ class SocketServerTest extends TestCase
             'timed_out' => false,
             'blocked' => false,
             'eof' => false,
-            'stream_type' => 'tcp_socket/ssl',
+            'stream_type' => 'unix_socket',
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,

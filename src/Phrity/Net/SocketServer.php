@@ -72,8 +72,8 @@ class SocketServer
 
     /**
      * Accept a connection on a socket.
-     * @param int $timeout Override the default socket accept timeout.
-     * @return \Phrity\Net\SocketStream The stream for opened conenction.
+     * @param int|null $timeout Override the default socket accept timeout.
+     * @return StreamInterface|null The stream for opened conenction.
      * @throws \RuntimeException if socket is closed
      */
     public function accept(?int $timeout = null): ?StreamInterface
@@ -83,7 +83,8 @@ class SocketServer
         }
         return $this->handler->with(function () use ($timeout) {
             $peer_name = '';
-            return stream_socket_accept($this->socket, $timeout, $peer_name);
+            $stream = stream_socket_accept($this->socket, $timeout, $peer_name);
+            return $stream ? new SocketStream($stream) : null;
         }, function (ErrorException $e) {
             // If non-blocking mode, don't throw error on time out
             if ($this->getMetadata('blocked') === false && substr_count($e->getMessage(), 'timed out') > 0) {

@@ -6,7 +6,7 @@
  * @see https://www.php-fig.org/psr/psr-7/#34-psrhttpmessagestreaminterface
  */
 
-namespace Phrity\Net;
+namespace Phrity\Net\Mock;
 
 use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
