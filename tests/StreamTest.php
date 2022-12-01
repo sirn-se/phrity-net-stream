@@ -120,6 +120,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Failed to seek.");
         $stream->seek(-1);
+        $stream->close();
     }
 
     public function testTellOnClosed(): void
@@ -131,6 +132,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is detached.");
         $stream->tell();
+        $stream->close();
     }
 
     public function testReadOnClosed(): void
@@ -142,6 +144,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is detached.");
         $stream->read(4);
+        $stream->close();
     }
 
     public function testWriteOnClosed(): void
@@ -153,6 +156,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is detached.");
         $stream->write("Will fail");
+        $stream->close();
     }
 
     public function testSeekOnClosed(): void
@@ -164,6 +168,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is detached.");
         $stream->seek(0);
+        $stream->close();
     }
 
     public function testRewindOnClosed(): void
@@ -175,6 +180,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is detached.");
         $stream->rewind();
+        $stream->close();
     }
 
     public function testGetContentsOnClosed(): void
@@ -186,6 +192,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is detached.");
         $stream->getContents();
+        $stream->close();
     }
 
     public function testReadOnly(): void
@@ -229,6 +236,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is not writable.");
         $stream->write("Should fail");
+        $stream->close();
     }
 
     public function testWriteOnly(): void
@@ -272,6 +280,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is not readable.");
         $stream->read(10);
+        $stream->close();
     }
 
     public function testWriteOnlyGetContentsError(): void
@@ -283,6 +292,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is not readable.");
         $stream->getContents();
+        $stream->close();
     }
 
     public function testDirectoryStream(): void
@@ -329,6 +339,8 @@ class StreamTest extends TestCase
         $this->assertFalse($stream->isSeekable());
         $this->assertFalse($stream->isWritable());
         $this->assertTrue($stream->isReadable());
+
+        $stream->close();
     }
 
     public function testSeekOnRemoteError(): void
@@ -338,6 +350,7 @@ class StreamTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Stream is not seekable.");
         $stream->seek(0);
+        $stream->close();
     }
 
     public function testConstructNoResource(): void

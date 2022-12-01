@@ -139,9 +139,10 @@ class StreamFactoryTest extends TestCase
 
     public function testCreateSocketServer(): void
     {
-        $url = new Uri('tcp://0.0.0.0:80');
+        $url = new Uri('tcp://0.0.0.0:8000');
         $factory = new StreamFactory();
         $server = $factory->createSocketServer($url);
         $this->assertInstanceOf(SocketServer::class, $server);
+        $server->close();
     }
 }
