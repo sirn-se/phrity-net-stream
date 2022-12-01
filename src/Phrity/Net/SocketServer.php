@@ -76,7 +76,7 @@ class SocketServer
      * @return \Psr\Http\Message\StreamInterface|null The stream for opened conenction.
      * @throws \RuntimeException if socket is closed
      */
-    public function accept(?int $timeout = null): ?StreamInterface
+    public function accept(?int $timeout = null): ?SocketStream
     {
         if (!isset($this->socket)) {
             throw new RuntimeException("Server is closed.");

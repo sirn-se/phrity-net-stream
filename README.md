@@ -30,7 +30,12 @@ implementing specified methods but no extras. Can be used anywhere where PSR-7 S
 
 ```php
 class Stream {
+
+    // Constructor
+
     public function __construct(resource $resource); // Must be a resource of type stream
+
+    // PSR-7 methods
 
     public function __toString(): string;
     public function close(): void;
@@ -50,17 +55,63 @@ class Stream {
 }
 ```
 
+## StreamSocket class
+
+The `Phrity\Net\StreamSocket` class extends `Phrity\Net\Stream` and adds extra methods usable on a socket stream.
+
+```php
+class StreamSocket {
+
+    // Methods
+
+    public function getRemoteName(): ?string; // Returns remote name
+    public function isBlocking(): ?bool; // If stream is blocking or not
+    public function setBlocking(bool $enable): bool; // Change blocking mode
+}
+```
+
+## SocketServer class
+
+The `Phrity\Net\SocketServer` class enables a server on local socket.
+
+```php
+class SocketServer {
+
+    // Constructor
+
+    public function __construct(UriInterface $uri, int $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN);
+
+    // Methods
+
+    public function close(): void; // Close socket server
+    public function accept(?int $timeout = null): ?SocketStream; // Accept connection on socket server
+    public function getTransports(): array; // Ge available transports
+    public function setBlocking(bool $enable): bool; // Change blocking mode
+    public function getMetadata($key = null): mixed; // Get metadata for socket server
+}
+```
+
 ## StreamFactory class
 
 The `Phrity\Net\StreamFactory` class is fully compatible with [PSR-17 StreamFactoryInterface](https://www.php-fig.org/psr/psr-17/#24-streamfactoryinterface),
-implementing specified methods but no extras. Can be used anywhere where PSR-17 StreamFactoryInterface compability is expected.
+implementing specified methods and some extras. Can be used anywhere where PSR-17 StreamFactoryInterface compability is expected.
 
 ```php
 class StreamFactory {
+
+    // Constructor
+
     public function __construct();
+
+    // PSR-17 methods
 
     public function createStream(string $content = ''): StreamInterface;
     public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface;
     public function createStreamFromResource(resource $resource): StreamInterface; // Must be a resource of type stream
+
+    // Additional methods
+
+    public function createSocketStreamFromResource($resource): SocketStream; // Create a socket stream
+    public function createSocketServer(UriInterface $uri, int $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN): SocketServer; // Create a socket server
 }
 ```
