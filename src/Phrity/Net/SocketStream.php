@@ -30,4 +30,17 @@ class SocketStream extends Stream
         return $this->getMetadata('blocked');
     }
 
+    /**
+     * Toggle blocking/non-blocking mode.
+     * @param bool $enable Blocking mode to set.
+     * @return bool If operation was succesful.
+     * @throws \RuntimeException if stream is closed.
+     */
+    public function setBlocking(bool $enable): bool
+    {
+        if (!isset($this->stream)) {
+            throw new RuntimeException("Stream is detached.");
+        }
+        return stream_set_blocking($this->stream, $enable);
+    }
 }

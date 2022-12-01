@@ -23,12 +23,12 @@ class SocketServer
     private static $internet_schemes = ['tcp', 'udp', 'tls', 'ssl'];
     private static $unix_schemes = ['unix', 'udg'];
 
-    private $handler;
-    private $socket;
+    protected $handler;
+    protected $socket;
 
     /**
      * Create new socker server instance
-     * UriInterface $uri The URI to open socket on.
+     * \Psr\Http\Message\UriInterface $uri The URI to open socket on.
      * int $flags Flags to set on socket.
      * @throws \RuntimeException if unable to create socket.
      */
@@ -73,7 +73,7 @@ class SocketServer
     /**
      * Accept a connection on a socket.
      * @param int|null $timeout Override the default socket accept timeout.
-     * @return StreamInterface|null The stream for opened conenction.
+     * @return \Psr\Http\Message\StreamInterface|null The stream for opened conenction.
      * @throws \RuntimeException if socket is closed
      */
     public function accept(?int $timeout = null): ?StreamInterface
@@ -81,10 +81,9 @@ class SocketServer
         if (!isset($this->socket)) {
             throw new RuntimeException("Server is closed.");
         }
-        return $this->handler->with(function () use ($timeout) {
+        $stream = $this->handler->with(function () use ($timeout) {
             $peer_name = '';
-            $stream = stream_socket_accept($this->socket, $timeout, $peer_name);
-            return $stream ? new SocketStream($stream) : null;
+            return stream_socket_accept($this->socket, $timeout, $peer_name);
         }, function (ErrorException $e) {
             // If non-blocking mode, don't throw error on time out
             if ($this->getMetadata('blocked') === false && substr_count($e->getMessage(), 'timed out') > 0) {
@@ -92,6 +91,7 @@ class SocketServer
             }
             throw new RuntimeException("Could not accept on socket.");
         });
+        return $stream ? new SocketStream($stream) : null;
     }
 
     /**
@@ -119,7 +119,6 @@ class SocketServer
 
     /**
      * Get stream metadata as an associative array or retrieve a specific key.
-     * @see http://php.net/manual/en/function.stream-get-meta-data.php
      * @param string $key Specific metadata to retrieve.
      * @return array|mixed|null Returns an associative array if no key is
      *     provided. Returns a specific key value if a key is provided and the

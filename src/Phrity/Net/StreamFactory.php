@@ -12,7 +12,6 @@ use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\{
     StreamFactoryInterface,
-    StreamInterface,
     UriInterface
 };
 use RuntimeException;
@@ -27,17 +26,20 @@ class StreamFactory implements StreamFactoryInterface
     private $handler;
 
     /**
-     * Create new stream wrapper instance
+     * Create new stream wrapper instance.
      */
     public function __construct()
     {
         $this->handler = new ErrorHandler();
     }
 
+
+    // ---------- PSR-17 methods --------------------------------------------------------------------------------------
+
     /**
      * Create a new stream from a string.
      * @param string $content String content with which to populate the stream.
-     * @return \Phrity\Net\Stream A stream instance
+     * @return \Phrity\Net\Stream A stream instance.
      */
     public function createStream(string $content = ''): Stream
     {
@@ -52,7 +54,7 @@ class StreamFactory implements StreamFactoryInterface
      * @param string $mode The mode with which to open the underlying filename/stream.
      * @throws \RuntimeException If the file cannot be opened.
      * @throws \InvalidArgumentException If the mode is invalid.
-     * @return \Phrity\Net\Stream A stream instance
+     * @return \Phrity\Net\Stream A stream instance.
      */
     public function createStreamFromFile(string $filename, string $mode = 'r'): Stream
     {
@@ -72,18 +74,32 @@ class StreamFactory implements StreamFactoryInterface
      * Create a new stream from an existing resource.
      * The stream MUST be readable and may be writable.
      * @param resource $resource The PHP resource to use as the basis for the stream.
-     * @return \Phrity\Net\Stream A stream instance
+     * @return \Phrity\Net\Stream A stream instance.
      */
     public function createStreamFromResource($resource): Stream
     {
         return new Stream($resource);
     }
 
+
+    // ---------- Extensions ------------------------------------------------------------------------------------------
+
+    /**
+     * Create a new ocket stream from an existing resource.
+     * The stream MUST be readable and may be writable.
+     * @param resource $resource The PHP resource to use as the basis for the stream.
+     * @return \Phrity\Net\SocketStream A socket stream instance.
+     */
+    public function createSocketStreamFromResource($resource): SocketStream
+    {
+        return new SocketStream($resource);
+    }
+
     /**
      * Create a new socket server.
-     * @param UriInterface $uri The URI to create server on.
+     * @param \Psr\Http\Message\UriInterface $uri The URI to create server on.
      * @param int $flags Flags to set on socket.
-     * @return \Phrity\Net\SocketServer A socket server instance
+     * @return \Phrity\Net\SocketServer A socket server instance.
      */
     public function createSocketServer(
         UriInterface $uri,

@@ -11,6 +11,7 @@ namespace Phrity\Net;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Phrity\Net\Uri;
 use Psr\Http\Message\{
     StreamFactoryInterface,
     StreamInterface
@@ -35,6 +36,7 @@ class StreamFactoryTest extends TestCase
     {
         $factory = new StreamFactory();
         $this->assertInstanceOf(StreamFactoryInterface::class, $factory);
+        $this->assertInstanceOf(StreamFactory::class, $factory);
     }
 
     public function testCreateStream(): void
@@ -42,6 +44,7 @@ class StreamFactoryTest extends TestCase
         $factory = new StreamFactory();
         $stream = $factory->createStream('Test creating stream');
         $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
     }
 
     public function testCreateStreamFromFile(): void
@@ -50,6 +53,7 @@ class StreamFactoryTest extends TestCase
         $file = __DIR__ . '/fixtures/stream.txt';
         $stream = $factory->createStreamFromFile($file, 'r+');
         $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
     }
 
     public function testCreateStreamFromFileNoFileError(): void
@@ -76,6 +80,7 @@ class StreamFactoryTest extends TestCase
         $file = __DIR__ . '/fixtures/stream-readonly.txt';
         $stream = $factory->createStreamFromFile($file, 'r');
         $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
     }
 
     public function testCreateStreamFromFileReadOnlyError(): void
@@ -110,6 +115,7 @@ class StreamFactoryTest extends TestCase
         $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
         $stream = $factory->createStreamFromResource($resource);
         $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
     }
 
     public function testCreateStreamFromResourceInvalidResource(): void
@@ -120,5 +126,22 @@ class StreamFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid stream provided; got type 'string'.");
         $stream = $factory->createStreamFromResource($resource);
+    }
+
+    public function testCreateSocketStreamFromResource(): void
+    {
+        $factory = new StreamFactory();
+        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        $stream = $factory->createSocketStreamFromResource($resource);
+        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(SocketStream::class, $stream);
+    }
+
+    public function testCreateSocketServer(): void
+    {
+        $url = new Uri('tcp://0.0.0.0:80');
+        $factory = new StreamFactory();
+        $server = $factory->createSocketServer($url);
+        $this->assertInstanceOf(SocketServer::class, $server);
     }
 }

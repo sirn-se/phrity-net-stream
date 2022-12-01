@@ -2,7 +2,7 @@
   "name": "phrity/net-stream",
   "type": "library",
   "description": "Socket stream classes implementing PSR-7 Stream and PSR-17 StreamFactory",
-  "homepage": "https://phrity.sirn.se/",
+  "homepage": "https://phrity.sirn.se/net-stream",
   "keywords": ["socket", "stream", "stream factory", "client", "server", "PSR-7", "PSR-17"],
   "license": "MIT",
   "authors": [

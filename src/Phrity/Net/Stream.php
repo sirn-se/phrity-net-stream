@@ -11,7 +11,6 @@ namespace Phrity\Net;
 use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\StreamInterface;
-use SEEK_SET;
 use RuntimeException;
 use Throwable;
 
@@ -83,7 +82,6 @@ class Stream implements StreamInterface
 
     /**
      * Get stream metadata as an associative array or retrieve a specific key.
-     * @see http://php.net/manual/en/function.stream-get-meta-data.php
      * @param string $key Specific metadata to retrieve.
      * @return array|mixed|null Returns an associative array if no key is
      *     provided. Returns a specific key value if a key is provided and the
@@ -127,11 +125,8 @@ class Stream implements StreamInterface
 
     /**
      * Read data from the stream.
-     * @param int $length Read up to $length bytes from the object and return
-     *     them. Fewer than $length bytes may be returned if underlying stream
-     *     call returns fewer bytes.
-     * @return string Returns the data read from the stream, or an empty string
-     *     if no bytes are available.
+     * @param int $length Read up to $length bytes from the object and return them.
+     * @return string Returns the data read from the stream, or an empty string.
      * @throws \RuntimeException if an error occurs.
      */
     public function read($length): string
@@ -175,7 +170,6 @@ class Stream implements StreamInterface
         if (!isset($this->stream)) {
             return null;
         }
-//        clearstatcache(true); @todo: do we need this, and how?
         $stats = fstat($this->stream);
         return $stats && array_key_exists('size', $stats) ? $stats['size'] : null;
     }
@@ -192,11 +186,7 @@ class Stream implements StreamInterface
     /**
      * Seek to a position in the stream.
      * @param int $offset Stream offset
-     * @param int $whence Specifies how the cursor position will be calculated
-     *     based on the seek offset. Valid values are identical to the built-in
-     *     PHP $whence values for `fseek()`. SEEK_SET: Set position equal to
-     *     offset bytes SEEK_CUR: Set position to current location plus offset
-     *     SEEK_END: Set position to end-of-stream plus offset.
+     * @param int $whence Specifies how the cursor position will be calculated based on the seek offset.
      * @throws \RuntimeException on failure.
      */
     public function seek($offset, $whence = SEEK_SET): void
@@ -278,6 +268,12 @@ class Stream implements StreamInterface
         }
     }
 
+
+    // ---------- Protected helper methods ----------------------------------------------------------------------------
+
+    /**
+     * Evaluate stream state.
+     */
     protected function evalStream(): void
     {
         $meta = $this->getMetadata();
