@@ -26,4 +26,16 @@ class SocketStreamTest extends TestCase
         $this->assertTrue($stream->setBlocking(false));
         $this->assertFalse($stream->isBlocking());
     }
+
+    public function testSetBlockingOnClosed(): void
+    {
+        $factory = new StreamFactory();
+        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        $stream = $factory->createSocketStreamFromResource($resource);
+        $stream->close();
+        $this->assertNull($stream->isBlocking());
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Stream is detached.");
+        $stream->setBlocking(false);
+    }
 }

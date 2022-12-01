@@ -7,6 +7,8 @@
 
 namespace Phrity\Net;
 
+use RuntimeException;
+
 /**
  * Net\SocketStream class.
  */
