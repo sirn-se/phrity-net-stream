@@ -55,12 +55,12 @@ class Stream {
 }
 ```
 
-## StreamSocket class
+## SocketStream class
 
-The `Phrity\Net\StreamSocket` class extends `Phrity\Net\Stream` and adds extra methods usable on a socket stream.
+The `Phrity\Net\SocketStream` class extends `Phrity\Net\Stream` and adds extra methods usable on a socket stream.
 
 ```php
-class StreamSocket {
+class SocketStream {
 
     // Methods
 
