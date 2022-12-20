@@ -15,15 +15,6 @@ Install with [Composer](https://getcomposer.org/);
 composer require phrity/net-stream
 ```
 
-
-## Versions
-
-| Version | PHP | |
-| --- | --- | --- |
-| `1.0` | `^7.4\|^8.0` | Initial version |
-| `1.1` | `^7.4\|^8.0` | Stream collection |
-
-
 ## Stream class
 
 The `Phrity\Net\Stream` class is fully compatible with [PSR-7 StreamInterface](https://www.php-fig.org/psr/psr-7/#34-psrhttpmessagestreaminterface),
@@ -84,11 +75,10 @@ class SocketServer extends Stream {
 
     // Methods
 
-    public function close(): void; // Close socket server
     public function accept(?int $timeout = null): ?SocketStream; // Accept connection on socket server
     public function getTransports(): array; // Ge available transports
+    public function isBlocking(): ?bool; // If stream is blocking or not
     public function setBlocking(bool $enable): bool; // Change blocking mode
-    public function getMetadata($key = null): mixed; // Get metadata for socket server
 }
 ```
 
@@ -150,3 +140,10 @@ class StreamFactory implements StreamFactoryInterface {
     public function createStreamCollection(): StreamCollection; // Create a stream collection
 }
 ```
+
+## Versions
+
+| Version | PHP | |
+| --- | --- | --- |
+| `1.0` | `^7.4\|^8.0` | Initial version |
+| `1.1` | `^7.4\|^8.0` | Stream collection |
