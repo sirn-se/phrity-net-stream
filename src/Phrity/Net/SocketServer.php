@@ -18,13 +18,13 @@ use RuntimeException;
 /**
  * Net\SocketServer class.
  */
-class SocketServer
+class SocketServer extends Stream
 {
     private static $internet_schemes = ['tcp', 'udp', 'tls', 'ssl'];
     private static $unix_schemes = ['unix', 'udg'];
 
     protected $handler;
-    protected $socket;
+    protected $stream;
 
     /**
      * Create new socker server instance
@@ -45,29 +45,10 @@ class SocketServer
         } else {
             throw new RuntimeException("Could not handle scheme '{$uri->getScheme()}'.");
         }
-        $this->socket = $this->handler->with(function () use ($address, $flags) {
+        $this->stream = $this->handler->with(function () use ($address, $flags) {
             $error_code = $error_message = '';
             return stream_socket_server($address, $error_code, $error_message, $flags);
         }, new RuntimeException("Could not create socket for '{$uri}'."));
-    }
-
-    /**
-     * Automatically close on destruct.
-     */
-    public function __destruct()
-    {
-        $this->close();
-    }
-
-    /**
-     * Close this server socket.
-     */
-    public function close(): void
-    {
-        if (isset($this->socket)) {
-            fclose($this->socket);
-            unset($this->socket);
-        }
     }
 
     /**
@@ -78,12 +59,12 @@ class SocketServer
      */
     public function accept(?int $timeout = null): ?SocketStream
     {
-        if (!isset($this->socket)) {
+        if (!isset($this->stream)) {
             throw new RuntimeException("Server is closed.");
         }
         $stream = $this->handler->with(function () use ($timeout) {
             $peer_name = '';
-            return stream_socket_accept($this->socket, $timeout, $peer_name);
+            return stream_socket_accept($this->stream, $timeout, $peer_name);
         }, function (ErrorException $e) {
             // If non-blocking mode, don't throw error on time out
             if ($this->getMetadata('blocked') === false && substr_count($e->getMessage(), 'timed out') > 0) {
@@ -104,6 +85,15 @@ class SocketServer
     }
 
     /**
+     * If server is in blocking mode.
+     * @return bool|null
+     */
+    public function isBlocking(): ?bool
+    {
+        return $this->getMetadata('blocked');
+    }
+
+    /**
      * Toggle blocking/non-blocking mode.
      * @param bool $enable Blocking mode to set.
      * @return bool If operation was succesful.
@@ -111,28 +101,9 @@ class SocketServer
      */
     public function setBlocking(bool $enable): bool
     {
-        if (!isset($this->socket)) {
+        if (!isset($this->stream)) {
             throw new RuntimeException("Server is closed.");
         }
-        return stream_set_blocking($this->socket, $enable);
-    }
-
-    /**
-     * Get stream metadata as an associative array or retrieve a specific key.
-     * @param string $key Specific metadata to retrieve.
-     * @return array|mixed|null Returns an associative array if no key is
-     *     provided. Returns a specific key value if a key is provided and the
-     *     value is found, or null if the key is not found.
-     */
-    public function getMetadata($key = null)
-    {
-        if (!isset($this->socket)) {
-            return null;
-        }
-        $meta = stream_get_meta_data($this->socket);
-        if (isset($key)) {
-            return array_key_exists($key, $meta) ? $meta[$key] : null;
-        }
-        return $meta;
+        return stream_set_blocking($this->stream, $enable);
     }
 }
