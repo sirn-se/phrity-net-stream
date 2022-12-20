@@ -53,6 +53,7 @@ class StreamCollectionTest extends TestCase
         }
 
         $this->assertTrue($collection->detach('@server'));
+        $this->assertFalse($collection->detach('no-such-key'));
         $this->assertCount(1, $collection);
 
         $this->assertTrue($collection->detach($stream));
