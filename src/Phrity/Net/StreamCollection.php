@@ -14,6 +14,7 @@ use Psr\Http\Message\{
     StreamInterface
 };
 use RuntimeException;
+use TypeError;
 
 /**
  * Net\StreamCollection class.
@@ -52,10 +53,10 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Detach stream from collection.
-     * @param StreamInterface|string $detach Stream or name of stream  to detach.
+     * @param Stream|string $detach Stream or name of stream  to detach.
      * @return self Current collection instance.
      */
-    public function detach(StreamInterface|string $detach): self
+    public function detach($detach): self
     {
         if (is_string($detach)) {
             if (array_key_exists($detach, $this->streams)) {
@@ -63,13 +64,16 @@ class StreamCollection implements Countable, Iterator
             }
             return $this;
         }
-        foreach ($this->streams as $key => $stream) {
-            if ($stream === $detach) {
-                unset($this->streams[$key]);
-                return $this;
+        if ($detach instanceof Stream) {
+            foreach ($this->streams as $key => $stream) {
+                if ($stream === $detach) {
+                    unset($this->streams[$key]);
+                    return $this;
+                }
             }
+            return $this;
         }
-        return $this;
+        throw new TypeError("Argument #1 ($detach) must be of type Phrity\Net\Stream or string.");
     }
 
     /**

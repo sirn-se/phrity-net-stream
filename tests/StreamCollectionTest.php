@@ -11,7 +11,6 @@ namespace Phrity\Net;
 
 use PHPUnit\Framework\TestCase;
 
-
 class StreamCollectionTest extends TestCase
 {
     public function testCollection(): void
