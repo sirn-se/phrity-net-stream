@@ -10,9 +10,6 @@ namespace Phrity\Net;
 use Countable;
 use Iterator;
 use Phrity\Util\ErrorHandler;
-use Psr\Http\Message\{
-    StreamInterface
-};
 use RuntimeException;
 use TypeError;
 
@@ -153,7 +150,7 @@ class StreamCollection implements Countable, Iterator
      * Return the current stream.
      * @return mixed Current stream.
      */
-    public function current(): StreamInterface
+    public function current(): Stream
     {
         return current($this->streams);
     }
