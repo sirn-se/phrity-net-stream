@@ -39,39 +39,40 @@ class StreamCollection implements Countable, Iterator
      * Attach stream to collection.
      * @param Stream $attach Stream to attach.
      * @param string|null $key Definable name of stream.
-     * @return self Current collection instance.
+     * @return string Name of stream.
      */
-    public function attach(Stream $attach, ?string $key = null): self
+    public function attach(Stream $attach, ?string $key = null): string
     {
         if ($key && array_key_exists($key, $this->streams)) {
             throw new RuntimeException("Stream with name '{$key}' already attached.");
         }
         $key = $key ?: $this->createKey();
         $this->streams[$key] = $attach;
-        return $this;
+        return $key;
     }
 
     /**
      * Detach stream from collection.
      * @param Stream|string $detach Stream or name of stream  to detach.
-     * @return self Current collection instance.
+     * @return bool If a stream was detached.
      */
-    public function detach($detach): self
+    public function detach($detach): bool
     {
         if (is_string($detach)) {
             if (array_key_exists($detach, $this->streams)) {
                 unset($this->streams[$detach]);
+                return true;
             }
-            return $this;
+            return false;
         }
         if ($detach instanceof Stream) {
             foreach ($this->streams as $key => $stream) {
                 if ($stream === $detach) {
                     unset($this->streams[$key]);
-                    return $this;
+                    return true;
                 }
             }
-            return $this;
+            return false;
         }
         throw new TypeError("Argument #1 ($detach) must be of type Phrity\Net\Stream or string.");
     }

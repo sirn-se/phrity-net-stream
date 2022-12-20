@@ -23,8 +23,8 @@ class StreamCollectionTest extends TestCase
         $stream = new SocketStream($resource);
 
         $collection = new StreamCollection();
-        $collection->attach($server, '@server');
-        $collection->attach($stream, '@stream');
+        $this->assertEquals('@server', $collection->attach($server, '@server'));
+        $this->assertEquals('@stream', $collection->attach($stream, '@stream'));
 
         $this->assertCount(2, $collection);
         foreach ($collection as $key => $item) {
@@ -52,15 +52,15 @@ class StreamCollectionTest extends TestCase
             $this->assertSame($stream, $item);
         }
 
-        $collection->detach('@server');
+        $this->assertTrue($collection->detach('@server'));
         $this->assertCount(1, $collection);
 
-        $collection->detach($stream);
+        $this->assertTrue($collection->detach($stream));
+        $this->assertFalse($collection->detach($server));
         $this->assertEmpty($collection);
 
-        $collection->attach($stream);
+        $this->assertIsString($collection->attach($stream));
         $this->assertCount(1, $collection);
-        $collection->detach('no such stream');
     }
 
     public function testAttachError(): void
