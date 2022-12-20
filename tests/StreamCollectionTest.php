@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Phrity\Net;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use TypeError;
 
 class StreamCollectionTest extends TestCase
 {
@@ -55,5 +57,26 @@ class StreamCollectionTest extends TestCase
 
         $collection->detach($stream);
         $this->assertEmpty($collection);
+
+        $collection->attach($stream);
+        $this->assertCount(1, $collection);
+        $collection->detach('no such stream');
+    }
+
+    public function testAttachError(): void
+    {
+        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        $stream = new SocketStream($resource);
+        $collection = new StreamCollection();
+        $collection->attach($stream, 'my-key');
+        $this->expectException(RuntimeException::class);
+        $collection->attach($stream, 'my-key');
+    }
+
+    public function testDetachhError(): void
+    {
+        $collection = new StreamCollection();
+        $this->expectException(TypeError::class);
+        $collection->detach(1);
     }
 }

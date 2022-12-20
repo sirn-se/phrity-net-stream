@@ -107,4 +107,13 @@ class StreamFactory implements StreamFactoryInterface
     ): SocketServer {
         return new SocketServer($uri, $flags);
     }
+
+    /**
+     * Create a new stream collection.
+     * @return \Phrity\Net\StreamCollection A stream collection.
+     */
+    public function createStreamCollection(): StreamCollection
+    {
+        return new StreamCollection();
+    }
 }

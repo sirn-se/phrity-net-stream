@@ -26,7 +26,9 @@ class SocketServerTest extends TestCase
         $uri = new Uri('tcp://0.0.0.0:8000');
         $server = new SocketServer($uri);
         $this->assertInstanceOf(SocketServer::class, $server);
+        $this->assertTrue($server->isBlocking());
         $this->assertTrue($server->setBlocking(false));
+        $this->assertFalse($server->isBlocking());
         $this->assertEquals([
             'timed_out' => false,
             'blocked' => false,
