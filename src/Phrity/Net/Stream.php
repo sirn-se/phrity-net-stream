@@ -268,6 +268,15 @@ class Stream implements StreamInterface
         }
     }
 
+    /**
+     * Return underlying resource.
+     * @return resource|null.
+     */
+    public function getResource()
+    {
+        return $this->stream;
+    }
+
 
     // ---------- Protected helper methods ----------------------------------------------------------------------------
 

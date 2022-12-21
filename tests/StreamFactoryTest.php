@@ -145,4 +145,11 @@ class StreamFactoryTest extends TestCase
         $this->assertInstanceOf(SocketServer::class, $server);
         $server->close();
     }
+
+    public function testCreateStreamCollection(): void
+    {
+        $factory = new StreamFactory();
+        $collection = $factory->createStreamCollection();
+        $this->assertInstanceOf(StreamCollection::class, $collection);
+    }
 }

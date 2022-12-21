@@ -15,21 +15,13 @@ Install with [Composer](https://getcomposer.org/);
 composer require phrity/net-stream
 ```
 
-
-## Versions
-
-| Version | PHP | |
-| --- | --- | --- |
-| `1.0` | `^7.4\|^8.0` | Initial version |
-
-
 ## Stream class
 
 The `Phrity\Net\Stream` class is fully compatible with [PSR-7 StreamInterface](https://www.php-fig.org/psr/psr-7/#34-psrhttpmessagestreaminterface),
 implementing specified methods but no extras. Can be used anywhere where PSR-7 StreamInterface compability is expected.
 
 ```php
-class Stream {
+class Stream implements StreamInterface {
 
     // Constructor
 
@@ -60,7 +52,7 @@ class Stream {
 The `Phrity\Net\SocketStream` class extends `Phrity\Net\Stream` and adds extra methods usable on a socket stream.
 
 ```php
-class SocketStream {
+class SocketStream extends Stream {
 
     // Methods
 
@@ -75,7 +67,7 @@ class SocketStream {
 The `Phrity\Net\SocketServer` class enables a server on local socket.
 
 ```php
-class SocketServer {
+class SocketServer extends Stream {
 
     // Constructor
 
@@ -83,11 +75,43 @@ class SocketServer {
 
     // Methods
 
-    public function close(): void; // Close socket server
     public function accept(?int $timeout = null): ?SocketStream; // Accept connection on socket server
     public function getTransports(): array; // Ge available transports
+    public function isBlocking(): ?bool; // If stream is blocking or not
     public function setBlocking(bool $enable): bool; // Change blocking mode
-    public function getMetadata($key = null): mixed; // Get metadata for socket server
+}
+```
+
+## StreamCollection class
+
+The `Phrity\Net\StreamCollection` class to handle zero to many connections.
+
+```php
+class StreamCollection implements Countable, Iterator {
+
+    // Constructor
+
+   public function __construct();
+
+    // Collectors and selectors
+
+    public function attach(Stream $attach, ?string $key = null): string; // Attach stream to collection
+    public function detach($detach): bool; // Detach stream from collection
+    public function getReadable(): self; // Get collection of readable streams
+    public function getWritable(): self; // Get collection of writable streams
+    public function waitRead(int $seconds = 60): self; // Wait for and get collection of streams with data to read
+
+    // Countable interface implementation
+
+    public function count(): int;
+
+    // Iterator interface implementation
+
+    public function current(): Stream;
+    public function key(): string;
+    public function next(): void;
+    public function rewind(): void;
+    public function valid(): bool;
 }
 ```
 
@@ -97,7 +121,7 @@ The `Phrity\Net\StreamFactory` class is fully compatible with [PSR-17 StreamFact
 implementing specified methods and some extras. Can be used anywhere where PSR-17 StreamFactoryInterface compability is expected.
 
 ```php
-class StreamFactory {
+class StreamFactory implements StreamFactoryInterface {
 
     // Constructor
 
@@ -113,5 +137,13 @@ class StreamFactory {
 
     public function createSocketStreamFromResource($resource): SocketStream; // Create a socket stream
     public function createSocketServer(UriInterface $uri, int $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN): SocketServer; // Create a socket server
+    public function createStreamCollection(): StreamCollection; // Create a stream collection
 }
 ```
+
+## Versions
+
+| Version | PHP | |
+| --- | --- | --- |
+| `1.0` | `^7.4\|^8.0` | Initial version |
+| `1.1` | `^7.4\|^8.0` | Stream collection |
