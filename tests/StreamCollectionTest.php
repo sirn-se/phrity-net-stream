@@ -32,17 +32,15 @@ class StreamCollectionTest extends TestCase
         }
 
         $readable = $collection->getReadable();
-        $this->assertCount(1, $readable);
+        $this->assertCount(2, $readable);
         foreach ($readable as $key => $item) {
-            $this->assertSame('@stream', $key);
-            $this->assertSame($stream, $item);
+            $this->assertSame($key == '@stream' ? $stream : $server, $item);
         }
 
         $writable = $collection->getWritable();
-        $this->assertCount(1, $writable);
+        $this->assertCount(2, $writable);
         foreach ($writable as $key => $item) {
-            $this->assertSame('@stream', $key);
-            $this->assertSame($stream, $item);
+            $this->assertSame($key == '@stream' ? $stream : $server, $item);
         }
 
         $changed = $collection->waitRead(10); // Should not block

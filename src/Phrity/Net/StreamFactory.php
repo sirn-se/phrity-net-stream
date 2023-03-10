@@ -109,6 +109,16 @@ class StreamFactory implements StreamFactoryInterface
     }
 
     /**
+     * Create a new socket client.
+     * @param \Psr\Http\Message\UriInterface $uri The URI to connect to.
+     * @return \Phrity\Net\SocketClient A socket client instance.
+     */
+    public function createSocketClient(UriInterface $uri): SocketClient
+    {
+        return new SocketClient($uri);
+    }
+
+    /**
      * Create a new stream collection.
      * @return \Phrity\Net\StreamCollection A stream collection.
      */

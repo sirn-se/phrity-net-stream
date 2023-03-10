@@ -49,6 +49,7 @@ class SocketServer extends Stream
             $error_code = $error_message = '';
             return stream_socket_server($address, $error_code, $error_message, $flags);
         }, new RuntimeException("Could not create socket for '{$uri}'."));
+        $this->evalStream();
     }
 
     /**

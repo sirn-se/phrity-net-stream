@@ -45,4 +45,9 @@ class SocketStream extends Stream
         }
         return stream_set_blocking($this->stream, $enable);
     }
+
+    public function setTimeout(int $seconds, int $microseconds = 0): bool
+    {
+        return stream_set_timeout($this->stream, $seconds, $microseconds);
+    }
 }

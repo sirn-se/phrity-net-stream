@@ -25,6 +25,8 @@ class SocketStreamTest extends TestCase
 
         $this->assertTrue($stream->setBlocking(false));
         $this->assertFalse($stream->isBlocking());
+
+        $this->assertFalse($stream->setTimeout(1, 2));
     }
 
     public function testSetBlockingOnClosed(): void
