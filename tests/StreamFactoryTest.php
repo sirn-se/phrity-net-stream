@@ -7,10 +7,17 @@
 
 declare(strict_types=1);
 
-namespace Phrity\Net;
+namespace Phrity\Net\Test;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Phrity\Net\{
+    SocketServer,
+    SocketStream,
+    Stream,
+    StreamCollection,
+    StreamFactory,
+};
 use Phrity\Net\Uri;
 use Psr\Http\Message\{
     StreamFactoryInterface,

@@ -7,10 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Phrity\Net;
+namespace Phrity\Net\Test;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Phrity\Net\{
+    Stream,
+    StreamFactory,
+};
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;

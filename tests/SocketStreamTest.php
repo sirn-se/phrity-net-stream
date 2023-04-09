@@ -7,9 +7,13 @@
 
 declare(strict_types=1);
 
-namespace Phrity\Net;
+namespace Phrity\Net\Test;
 
 use PHPUnit\Framework\TestCase;
+use Phrity\Net\{
+    SocketStream,
+    StreamFactory,
+};
 use RuntimeException;
 
 class SocketStreamTest extends TestCase

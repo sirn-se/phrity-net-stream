@@ -1,11 +1,5 @@
 <?php
 
-/**
- * File for Net\StreamFactory class.
- * @package Phrity > Net > Stream
- * @see https://www.php-fig.org/psr/psr-17/#24-streamfactoryinterface
- */
-
 namespace Phrity\Net;
 
 use InvalidArgumentException;
@@ -17,7 +11,8 @@ use Psr\Http\Message\{
 use RuntimeException;
 
 /**
- * Net\StreamFactory class.
+ * Phrity\Net\StreamFactory class.
+ * @see https://www.php-fig.org/psr/psr-17/#24-streamfactoryinterface
  */
 class StreamFactory implements StreamFactoryInterface
 {

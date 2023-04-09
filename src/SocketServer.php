@@ -1,10 +1,5 @@
 <?php
 
-/**
- * File for Net\SocketServer class.
- * @package Phrity > Net > Stream
- */
-
 namespace Phrity\Net;
 
 use ErrorException;
@@ -16,7 +11,7 @@ use Psr\Http\Message\{
 use RuntimeException;
 
 /**
- * Net\SocketServer class.
+ * Phrity\Net\SocketServer class.
  */
 class SocketServer extends Stream
 {
@@ -52,29 +47,8 @@ class SocketServer extends Stream
         $this->evalStream();
     }
 
-    /**
-     * Accept a connection on a socket.
-     * @param int|null $timeout Override the default socket accept timeout.
-     * @return \Psr\Http\Message\StreamInterface|null The stream for opened conenction.
-     * @throws \RuntimeException if socket is closed
-     */
-    public function accept(?int $timeout = null): ?SocketStream
-    {
-        if (!isset($this->stream)) {
-            throw new RuntimeException("Server is closed.");
-        }
-        $stream = $this->handler->with(function () use ($timeout) {
-            $peer_name = '';
-            return stream_socket_accept($this->stream, $timeout, $peer_name);
-        }, function (ErrorException $e) {
-            // If non-blocking mode, don't throw error on time out
-            if ($this->getMetadata('blocked') === false && substr_count($e->getMessage(), 'timed out') > 0) {
-                return null;
-            }
-            throw new RuntimeException("Could not accept on socket.");
-        });
-        return $stream ? new SocketStream($stream) : null;
-    }
+
+    // ---------- Configuration ---------------------------------------------------------------------------------------
 
     /**
      * Retrieve list of registered socket transports.
@@ -106,5 +80,32 @@ class SocketServer extends Stream
             throw new RuntimeException("Server is closed.");
         }
         return stream_set_blocking($this->stream, $enable);
+    }
+
+
+    // ---------- Operations ------------------------------------------------------------------------------------------
+
+    /**
+     * Accept a connection on a socket.
+     * @param int|null $timeout Override the default socket accept timeout.
+     * @return Phrity\Net\SocketStream|null The stream for opened conenction.
+     * @throws \RuntimeException if socket is closed
+     */
+    public function accept(?int $timeout = null): ?SocketStream
+    {
+        if (!isset($this->stream)) {
+            throw new RuntimeException("Server is closed.");
+        }
+        $stream = $this->handler->with(function () use ($timeout) {
+            $peer_name = '';
+            return stream_socket_accept($this->stream, $timeout, $peer_name);
+        }, function (ErrorException $e) {
+            // If non-blocking mode, don't throw error on time out
+            if ($this->getMetadata('blocked') === false && substr_count($e->getMessage(), 'timed out') > 0) {
+                return null;
+            }
+            throw new RuntimeException("Could not accept on socket.");
+        });
+        return $stream ? new SocketStream($stream) : null;
     }
 }

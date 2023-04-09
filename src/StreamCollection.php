@@ -1,10 +1,5 @@
 <?php
 
-/**
- * File for Net\StreamCollection class.
- * @package Phrity > Net > Stream
- */
-
 namespace Phrity\Net;
 
 use Countable;
@@ -14,7 +9,7 @@ use RuntimeException;
 use TypeError;
 
 /**
- * Net\StreamCollection class.
+ * Phrity\Net\StreamCollection class.
  */
 class StreamCollection implements Countable, Iterator
 {
@@ -30,7 +25,7 @@ class StreamCollection implements Countable, Iterator
     }
 
 
-    // Collectors and selectors
+    // ---------- Collectors and selectors ----------------------------------------------------------------------------
 
     /**
      * Attach stream to collection.
@@ -132,7 +127,7 @@ class StreamCollection implements Countable, Iterator
     }
 
 
-    // Countable interface implementation
+    // ---------- Countable interface implementation ------------------------------------------------------------------
 
     /**
      * Count contained streams.
@@ -144,7 +139,7 @@ class StreamCollection implements Countable, Iterator
     }
 
 
-    // Iterator interface implementation
+    // ---------- Iterator interface implementation -------------------------------------------------------------------
 
     /**
      * Return the current stream.
@@ -190,7 +185,7 @@ class StreamCollection implements Countable, Iterator
     }
 
 
-    // Protected helper methods
+    // ---------- Protected helper methods ----------------------------------------------------------------------------
 
     /**
      * Create unique key.

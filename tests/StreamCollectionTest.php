@@ -7,9 +7,15 @@
 
 declare(strict_types=1);
 
-namespace Phrity\Net;
+namespace Phrity\Net\Test;
 
 use PHPUnit\Framework\TestCase;
+use Phrity\Net\{
+    SocketServer,
+    SocketStream,
+    StreamCollection,
+};
+use Phrity\Net\Uri;
 use RuntimeException;
 use TypeError;
 

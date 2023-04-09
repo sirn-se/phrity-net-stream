@@ -1,11 +1,5 @@
 <?php
 
-/**
- * File for Net\Stream class.
- * @package Phrity > Net > Stream
- * @see https://www.php-fig.org/psr/psr-7/#34-psrhttpmessagestreaminterface
- */
-
 namespace Phrity\Net;
 
 use InvalidArgumentException;
@@ -15,8 +9,9 @@ use RuntimeException;
 use Throwable;
 
 /**
- * Net\Stream class.
- */
+ * Phrity\Net\Stream class.
+ * @see https://www.php-fig.org/psr/psr-7/#34-psrhttpmessagestreaminterface
+*/
 class Stream implements StreamInterface
 {
     private static $readmodes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
@@ -60,7 +55,7 @@ class Stream implements StreamInterface
         if (isset($this->stream)) {
             fclose($this->stream);
         }
-        unset($this->stream);
+        $this->stream = null;
         $this->evalStream();
     }
 
@@ -75,7 +70,7 @@ class Stream implements StreamInterface
             return null;
         }
         $stream = $this->stream;
-        unset($this->stream);
+        $this->stream = null;
         $this->evalStream();
         return $stream;
     }
@@ -138,7 +133,7 @@ class Stream implements StreamInterface
             throw new RuntimeException('Stream is not readable.');
         }
         return $this->handler->with(function () use ($length) {
-            return fread($this->stream, $length);
+            return (string)fread($this->stream, $length);
         }, new RuntimeException('Failed read() on stream.'));
     }
 
