@@ -12,17 +12,9 @@ use Phrity\Net\{
 use Phrity\Net\Test\SocketServerMock;
 use Phrity\Net\Uri;
 use RuntimeException;
-use function hey as stream_socket_client;
 
 class SocketClientTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        if (file_exists('/tmp/test.sock')) {
-            unlink('/tmp/test.sock');
-        }
-    }
-
     public function testClient(): void
     {
         $uri = new Uri('tcp://www.php.net:80');
