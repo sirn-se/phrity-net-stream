@@ -57,8 +57,12 @@ class SocketStream extends Stream {
     // Methods
 
     public function getRemoteName(): ?string; // Returns remote name
+    public function getLocalName(): ?string; // Returns local name
+    public function getResourceType(): string; // Get resource type
     public function isBlocking(): ?bool; // If stream is blocking or not
     public function setBlocking(bool $enable): bool; // Change blocking mode
+    public function setTimeout(int $seconds, int $microseconds = 0): bool; // Set timeout
+    public function readLine(int $length): ?string // Read a line from string, up to $length bytes
 }
 ```
 
@@ -76,9 +80,29 @@ class SocketServer extends Stream {
     // Methods
 
     public function accept(?int $timeout = null): ?SocketStream; // Accept connection on socket server
-    public function getTransports(): array; // Ge available transports
+    public function getTransports(): array; // Get available transports
     public function isBlocking(): ?bool; // If stream is blocking or not
     public function setBlocking(bool $enable): bool; // Change blocking mode
+}
+```
+
+## SockeClient class
+
+The `Phrity\Net\SockeClient` class enables a client for remote socket.
+
+```php
+class SocketClient {
+
+    // Constructor
+
+    public function __construct(UriInterface $uri);
+
+    // Methods
+
+    public function setPersistent(bool $persistent): self; // If client should use persisten connection
+    public function setTimeout(?int $timeout): self; // Set timeout
+    public function setContext(?array $options = null, ?array $params = null): self; // Set stream context
+    public function connect(): ?SocketStream; // Connect to remote
 }
 ```
 
@@ -137,6 +161,7 @@ class StreamFactory implements StreamFactoryInterface {
 
     public function createSocketStreamFromResource($resource): SocketStream; // Create a socket stream
     public function createSocketServer(UriInterface $uri, int $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN): SocketServer; // Create a socket server
+    public function createSocketClient(UriInterface $uri): SocketClient; / Create socket client
     public function createStreamCollection(): StreamCollection; // Create a stream collection
 }
 ```
@@ -145,5 +170,6 @@ class StreamFactory implements StreamFactoryInterface {
 
 | Version | PHP | |
 | --- | --- | --- |
-| `1.0` | `^7.4\|^8.0` | Initial version |
+| `1.2` | `^7.4\|^8.0` | Socket client |
 | `1.1` | `^7.4\|^8.0` | Stream collection |
+| `1.0` | `^7.4\|^8.0` | Initial version |

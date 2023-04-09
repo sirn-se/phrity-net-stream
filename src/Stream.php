@@ -263,6 +263,9 @@ class Stream implements StreamInterface
         }
     }
 
+
+    // ---------- Extended methods ------------------------------------------------------------------------------------
+
     /**
      * Return underlying resource.
      * @return resource|null.

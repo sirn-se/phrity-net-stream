@@ -21,8 +21,7 @@ class SocketClient
 
     /**
      * Create new socker server instance
-     * \Psr\Http\Message\UriInterface $uri The URI to open socket on.
-     * int $flags Flags to set on socket.
+     * @param \Psr\Http\Message\UriInterface $uri The URI to open socket on.
      * @throws \RuntimeException if unable to create socket.
      */
     public function __construct(UriInterface $uri)
@@ -36,7 +35,7 @@ class SocketClient
 
     /**
      * Set connection persistency.
-     * $param bool $persistent
+     * @param bool $persistent
      * @return \Phrity\Net\SocketClient
      */
     public function setPersistent(bool $persistent): self
@@ -47,7 +46,7 @@ class SocketClient
 
     /**
      * Set timeout in seconds.
-     * $param int|null $timeout
+     * @param int|null $timeout
      * @return \Phrity\Net\SocketClient
      */
     public function setTimeout(?int $timeout): self
@@ -58,12 +57,13 @@ class SocketClient
 
     /**
      * Set stream context.
-     * $param int|null $timeout
+     * @param array|null $options
+     * @param array|null $params
      * @return \Phrity\Net\SocketClient
      */
-    public function setContext(array $context): self
+    public function setContext(?array $options = null, ?array $params = null): self
     {
-        $this->context = $context;
+        $this->context = stream_context_create($options, $params);
         return $this;
     }
 
@@ -90,6 +90,4 @@ class SocketClient
         }, new RuntimeException("Could not create connection for '{$this->uri}'."));
         return $stream ? new SocketStream($stream) : null;
     }
-
-
 }

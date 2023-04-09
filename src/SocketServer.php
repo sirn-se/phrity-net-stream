@@ -23,8 +23,8 @@ class SocketServer extends Stream
 
     /**
      * Create new socker server instance
-     * \Psr\Http\Message\UriInterface $uri The URI to open socket on.
-     * int $flags Flags to set on socket.
+     * @param \Psr\Http\Message\UriInterface $uri The URI to open socket on.
+     * @param int $flags Flags to set on socket.
      * @throws \RuntimeException if unable to create socket.
      */
     public function __construct(UriInterface $uri, int $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN)
