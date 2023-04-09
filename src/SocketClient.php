@@ -14,6 +14,7 @@ use RuntimeException;
  */
 class SocketClient
 {
+    protected $uri;
     protected $handler;
     protected $persistent = false;
     protected $timeout = null;
