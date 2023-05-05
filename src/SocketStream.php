@@ -10,6 +10,15 @@ use RuntimeException;
 class SocketStream extends Stream
 {
     /**
+     * If stream is connected.
+     * @return bool
+     */
+    public function isConnected(): bool
+    {
+        return $this->stream && ($this->readable || $this->writable);
+    }
+
+    /**
      * Get name of remote socket, or null if not connected.
      * @return string|null
      */

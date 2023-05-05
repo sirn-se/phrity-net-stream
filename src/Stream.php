@@ -283,14 +283,13 @@ class Stream implements StreamInterface
      */
     protected function evalStream(): void
     {
-        $meta = $this->getMetadata();
-        if (!$meta) {
-            $this->readable = $this->writable = $this->seekable = false;
+        if ($this->stream && $meta = $this->getMetadata()) {
+            $mode = substr($meta['mode'], 0, 2);
+            $this->readable = in_array($mode, self::$readmodes);
+            $this->writable = in_array($mode, self::$writemodes);
+            $this->seekable = $meta['seekable'];
             return;
         }
-        $mode = substr($meta['mode'], 0, 2);
-        $this->readable = in_array($mode, self::$readmodes);
-        $this->writable = in_array($mode, self::$writemodes);
-        $this->seekable = $meta['seekable'];
+        $this->readable = $this->writable = $this->seekable = false;
     }
 }

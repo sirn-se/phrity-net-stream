@@ -73,10 +73,10 @@ class SocketClient
 
     /**
      * Create a connection on remote socket.
-     * @return \Phrity\Net\SocketStream|null The stream for opened conenction.
+     * @return \Phrity\Net\SocketStream The stream for opened conenction.
      * @throws \RuntimeException if connection could not be created
      */
-    public function connect(): ?SocketStream
+    public function connect(): SocketStream
     {
         $stream = $this->handler->with(function () {
             $error_code = $error_message = '';
@@ -89,6 +89,9 @@ class SocketClient
                 $this->context
             );
         }, new RuntimeException("Could not create connection for '{$this->uri}'."));
-        return $stream ? new SocketStream($stream) : null;
+        if ($stream) {
+            return new SocketStream($stream);
+        }
+        throw new RuntimeException("Could not connect to '{$this->uri}'.");
     }
 }
