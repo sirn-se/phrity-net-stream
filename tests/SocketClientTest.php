@@ -8,10 +8,9 @@ use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     SocketClient,
     SocketStream,
+    StreamException,
+    Uri
 };
-use Phrity\Net\Test\SocketServerMock;
-use Phrity\Net\Uri;
-use RuntimeException;
 
 class SocketClientTest extends TestCase
 {
@@ -34,8 +33,9 @@ class SocketClientTest extends TestCase
         $uri = new Uri('tcp://localhost:80');
         $client = new SocketClient($uri);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Could not create connection for 'tcp://localhost:80'.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::CLIENT_CONNECT_ERR);
+        $this->expectExceptionMessage('Client could not connect to "tcp://localhost:80".');
         $client->connect();
     }
 }

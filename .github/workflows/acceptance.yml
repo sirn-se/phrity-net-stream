@@ -63,6 +63,21 @@ jobs:
     - name: Test
       run: make test
 
+  test-8-3:
+    runs-on: ubuntu-latest
+    name: Test PHP 8.3
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up PHP 8.3
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+    - name: Composer
+      run: make deps-install
+    - name: Test
+      run: make test
+
   cs-check:
     runs-on: ubuntu-latest
     name: Code standard

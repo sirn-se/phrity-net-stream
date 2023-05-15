@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     SocketStream,
     StreamFactory,
+    StreamException
 };
-use RuntimeException;
 
 class SocketStreamTest extends TestCase
 {
@@ -42,8 +42,9 @@ class SocketStreamTest extends TestCase
         $stream = $factory->createSocketStreamFromResource($resource);
         $stream->close();
         $this->assertNull($stream->isBlocking());
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->setBlocking(false);
     }
 
@@ -54,8 +55,9 @@ class SocketStreamTest extends TestCase
         $stream = $factory->createSocketStreamFromResource($resource);
         $stream->close();
         $this->assertNull($stream->isBlocking());
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->setTimeout(1, 2);
     }
 
@@ -73,8 +75,9 @@ class SocketStreamTest extends TestCase
         $resource = fopen(__DIR__ . '/fixtures/stream-readonly.txt', 'r');
         $stream = $factory->createSocketStreamFromResource($resource);
         $stream->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->readLine(1024);
     }
 
@@ -83,8 +86,9 @@ class SocketStreamTest extends TestCase
         $factory = new StreamFactory();
         $resource = fopen(__DIR__ . '/fixtures/stream-writeonly.txt', 'w');
         $stream = $factory->createSocketStreamFromResource($resource);
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not readable.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::NOT_READABLE);
+        $this->expectExceptionMessage('Stream is not readable.');
         $stream->readLine(1024);
     }
 }

@@ -14,9 +14,9 @@ use Phrity\Net\{
     SocketServer,
     SocketStream,
     StreamCollection,
+    StreamException
 };
 use Phrity\Net\Uri;
-use RuntimeException;
 use TypeError;
 
 class StreamCollectionTest extends TestCase
@@ -74,7 +74,9 @@ class StreamCollectionTest extends TestCase
         $stream = new SocketStream($resource);
         $collection = new StreamCollection();
         $collection->attach($stream, 'my-key');
-        $this->expectException(RuntimeException::class);
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::COLLECT_KEY_CONFLICT);
+        $this->expectExceptionMessage('Stream with name "my-key" already attached.');
         $collection->attach($stream, 'my-key');
     }
 

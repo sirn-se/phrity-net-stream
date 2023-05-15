@@ -3,10 +3,7 @@
 namespace Phrity\Net;
 
 use Phrity\Util\ErrorHandler;
-use Psr\Http\Message\{
-    StreamInterface,
-    UriInterface
-};
+use Psr\Http\Message\UriInterface;
 use RuntimeException;
 
 /**
@@ -23,7 +20,6 @@ class SocketClient
     /**
      * Create new socker server instance
      * @param \Psr\Http\Message\UriInterface $uri The URI to open socket on.
-     * @throws \RuntimeException if unable to create socket.
      */
     public function __construct(UriInterface $uri)
     {
@@ -33,6 +29,18 @@ class SocketClient
 
 
     // ---------- Configuration ---------------------------------------------------------------------------------------
+
+    /**
+     * Set stream context.
+     * @param array|null $options
+     * @param array|null $params
+     * @return \Phrity\Net\SocketClient
+     */
+    public function setContext(?array $options = null, ?array $params = null): self
+    {
+        $this->context = stream_context_create($options, $params);
+        return $this;
+    }
 
     /**
      * Set connection persistency.
@@ -56,25 +64,13 @@ class SocketClient
         return $this;
     }
 
-    /**
-     * Set stream context.
-     * @param array|null $options
-     * @param array|null $params
-     * @return \Phrity\Net\SocketClient
-     */
-    public function setContext(?array $options = null, ?array $params = null): self
-    {
-        $this->context = stream_context_create($options, $params);
-        return $this;
-    }
-
 
     // ---------- Operations ------------------------------------------------------------------------------------------
 
     /**
      * Create a connection on remote socket.
      * @return \Phrity\Net\SocketStream The stream for opened conenction.
-     * @throws \RuntimeException if connection could not be created
+     * @throws StreamException if connection could not be created
      */
     public function connect(): SocketStream
     {
@@ -88,10 +84,10 @@ class SocketClient
                 $this->persistent ? STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT : STREAM_CLIENT_CONNECT,
                 $this->context
             );
-        }, new RuntimeException("Could not create connection for '{$this->uri}'."));
+        }, new StreamException(StreamException::CLIENT_CONNECT_ERR, ['uri' => $this->uri]));
         if ($stream) {
             return new SocketStream($stream);
         }
-        throw new RuntimeException("Could not connect to '{$this->uri}'.");
+        throw new StreamException(StreamException::CLIENT_CONNECT_ERR, ['uri' => $this->uri]);
     }
 }

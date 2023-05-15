@@ -2,13 +2,13 @@
 
 namespace Phrity\Net;
 
-use RuntimeException;
-
 /**
  * Phrity\Net\SocketStream class.
  */
 class SocketStream extends Stream
 {
+    // ---------- Configuration ---------------------------------------------------------------------------------------
+
     /**
      * If stream is connected.
      * @return bool
@@ -58,12 +58,12 @@ class SocketStream extends Stream
      * Toggle blocking/non-blocking mode.
      * @param bool $enable Blocking mode to set.
      * @return bool If operation was succesful.
-     * @throws \RuntimeException if stream is closed.
+     * @throws \StreamException if stream is closed.
      */
     public function setBlocking(bool $enable): bool
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException("Stream is detached.");
+            throw new StreamException(StreamException::STREAM_DETACHED);
         }
         return stream_set_blocking($this->stream, $enable);
     }
@@ -73,33 +73,36 @@ class SocketStream extends Stream
      * @param int $seconds Seconds to be set.
      * @param int $microseconds Microseconds to be set.
      * @return bool If operation was succesful.
-     * @throws \RuntimeException if stream is closed.
+     * @throws \StreamException if stream is closed.
      */
     public function setTimeout(int $seconds, int $microseconds = 0): bool
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException("Stream is detached.");
+            throw new StreamException(StreamException::STREAM_DETACHED);
         }
         return stream_set_timeout($this->stream, $seconds, $microseconds);
     }
+
+
+    // ---------- Operations ------------------------------------------------------------------------------------------
 
     /**
      * Read line from the stream.
      * @param int $length Read up to $length bytes from the object and return them.
      * @return string|null Returns the data read from the stream, or null of eof.
-     * @throws \RuntimeException if an error occurs.
+     * @throws \StreamException if an error occurs.
      */
     public function readLine(int $length): ?string
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached.');
+            throw new StreamException(StreamException::STREAM_DETACHED);
         }
         if (!$this->readable) {
-            throw new RuntimeException('Stream is not readable.');
+            throw new StreamException(StreamException::NOT_READABLE);
         }
         return $this->handler->with(function () use ($length) {
             $result = fgets($this->stream, $length);
             return $result === false ? null : $result;
-        }, new RuntimeException('Failed gets() on stream.'));
+        }, new StreamException(StreamException::FAIL_GETS));
     }
 }

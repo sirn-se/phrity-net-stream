@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     Stream,
     StreamFactory,
+    StreamException
 };
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\StreamInterface;
@@ -121,8 +122,9 @@ class StreamTest extends TestCase
     {
         $factory = new StreamFactory();
         $stream = $factory->createStream('This is a temporary test stream');
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Failed to seek.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::FAIL_SEEK);
+        $this->expectExceptionMessage('Failed seek() on stream.');
         $stream->seek(-1);
         $stream->close();
     }
@@ -133,8 +135,9 @@ class StreamTest extends TestCase
         $stream = $factory->createStream('This is a temporary test stream');
 
         $stream->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->tell();
         $stream->close();
     }
@@ -145,8 +148,9 @@ class StreamTest extends TestCase
         $stream = $factory->createStream('This is a temporary test stream');
 
         $stream->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->read(4);
         $stream->close();
     }
@@ -157,8 +161,9 @@ class StreamTest extends TestCase
         $stream = $factory->createStream('This is a temporary test stream');
 
         $stream->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->write("Will fail");
         $stream->close();
     }
@@ -169,8 +174,9 @@ class StreamTest extends TestCase
         $stream = $factory->createStream('This is a temporary test stream');
 
         $stream->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->seek(0);
         $stream->close();
     }
@@ -181,8 +187,9 @@ class StreamTest extends TestCase
         $stream = $factory->createStream('This is a temporary test stream');
 
         $stream->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->rewind();
         $stream->close();
     }
@@ -193,8 +200,9 @@ class StreamTest extends TestCase
         $stream = $factory->createStream('This is a temporary test stream');
 
         $stream->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is detached.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::STREAM_DETACHED);
+        $this->expectExceptionMessage('Stream is detached.');
         $stream->getContents();
         $stream->close();
     }
@@ -237,8 +245,9 @@ class StreamTest extends TestCase
         $file = __DIR__ . '/fixtures/stream-readonly.txt';
         $stream = $factory->createStreamFromFile($file, 'r');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not writable.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::NOT_WRITABLE);
+        $this->expectExceptionMessage('Stream is not writable.');
         $stream->write("Should fail");
         $stream->close();
     }
@@ -281,8 +290,9 @@ class StreamTest extends TestCase
         $file = __DIR__ . '/fixtures/stream-writeonly.txt';
         $stream = $factory->createStreamFromFile($file, 'w');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not readable.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::NOT_READABLE);
+        $this->expectExceptionMessage('Stream is not readable.');
         $stream->read(10);
         $stream->close();
     }
@@ -293,8 +303,9 @@ class StreamTest extends TestCase
         $file = __DIR__ . '/fixtures/stream-writeonly.txt';
         $stream = $factory->createStreamFromFile($file, 'w');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not readable.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::NOT_READABLE);
+        $this->expectExceptionMessage('Stream is not readable.');
         $stream->getContents();
         $stream->close();
     }
@@ -351,8 +362,9 @@ class StreamTest extends TestCase
     {
         $remote = fopen('https://phrity.sirn.se/', 'r');
         $stream = new Stream($remote);
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Stream is not seekable.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::NOT_SEEKABLE);
+        $this->expectExceptionMessage('Stream is not seekable.');
         $stream->seek(0);
         $stream->close();
     }

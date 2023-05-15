@@ -80,14 +80,13 @@ class StreamFactory implements StreamFactoryInterface
     // ---------- Extensions ------------------------------------------------------------------------------------------
 
     /**
-     * Create a new ocket stream from an existing resource.
-     * The stream MUST be readable and may be writable.
-     * @param resource $resource The PHP resource to use as the basis for the stream.
-     * @return \Phrity\Net\SocketStream A socket stream instance.
+     * Create a new socket client.
+     * @param \Psr\Http\Message\UriInterface $uri The URI to connect to.
+     * @return \Phrity\Net\SocketClient A socket client instance.
      */
-    public function createSocketStreamFromResource($resource): SocketStream
+    public function createSocketClient(UriInterface $uri): SocketClient
     {
-        return new SocketStream($resource);
+        return new SocketClient($uri);
     }
 
     /**
@@ -104,13 +103,14 @@ class StreamFactory implements StreamFactoryInterface
     }
 
     /**
-     * Create a new socket client.
-     * @param \Psr\Http\Message\UriInterface $uri The URI to connect to.
-     * @return \Phrity\Net\SocketClient A socket client instance.
+     * Create a new ocket stream from an existing resource.
+     * The stream MUST be readable and may be writable.
+     * @param resource $resource The PHP resource to use as the basis for the stream.
+     * @return \Phrity\Net\SocketStream A socket stream instance.
      */
-    public function createSocketClient(UriInterface $uri): SocketClient
+    public function createSocketStreamFromResource($resource): SocketStream
     {
-        return new SocketClient($uri);
+        return new SocketStream($resource);
     }
 
     /**
