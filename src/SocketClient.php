@@ -85,9 +85,6 @@ class SocketClient
                 $this->context
             );
         }, new StreamException(StreamException::CLIENT_CONNECT_ERR, ['uri' => $this->uri]));
-        if ($stream) {
-            return new SocketStream($stream);
-        }
-        throw new StreamException(StreamException::CLIENT_CONNECT_ERR, ['uri' => $this->uri]);
+        return new SocketStream($stream);
     }
 }

@@ -86,4 +86,11 @@ class StreamCollectionTest extends TestCase
         $this->expectException(TypeError::class);
         $collection->detach(1);
     }
+
+    public function testEmptyCollection(): void
+    {
+        $collection = new StreamCollection();
+        $changed = $collection->waitRead(10); // Should not block
+        $this->assertEmpty($changed);
+    }
 }

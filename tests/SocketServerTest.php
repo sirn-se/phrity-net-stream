@@ -42,6 +42,7 @@ class SocketServerTest extends TestCase
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,
+            'uri' => 'tcp://0.0.0.0:8000',
         ], $server->getMetadata());
         $stream = $server->accept(0);
         $this->assertNull($stream); // Non-blocking, nothing to accept
@@ -63,6 +64,7 @@ class SocketServerTest extends TestCase
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,
+            'uri' => 'unix:///tmp/test.sock',
         ], $server->getMetadata());
         $stream = $server->accept(0);
         $this->assertNull($stream); // Non-blocking, nothing to accept
@@ -108,6 +110,7 @@ class SocketServerTest extends TestCase
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,
+            'uri' => 'tcp://0.0.0.0:8000',
         ], $server->getMetadata());
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::SERVER_ACCEPT_ERR);

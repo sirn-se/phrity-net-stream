@@ -24,6 +24,7 @@ class SocketStreamTest extends TestCase
         $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
         $stream = $factory->createSocketStreamFromResource($resource);
 
+        $this->assertTrue($stream->isConnected());
         $this->assertEquals('', $stream->getRemoteName());
         $this->assertEquals('', $stream->getLocalName());
         $this->assertEquals('stream', $stream->getResourceType());

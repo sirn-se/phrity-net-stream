@@ -15,6 +15,7 @@ class SocketServer extends Stream
     private static $unix_schemes = ['unix', 'udg'];
 
     protected $handler;
+    protected $address;
     protected $stream;
 
     /**
@@ -30,15 +31,15 @@ class SocketServer extends Stream
             throw new StreamException(StreamException::SCHEME_TRANSPORT, ['scheme' => $uri->getScheme()]);
         }
         if (in_array(substr($uri->getScheme(), 0, 3), self::$internet_schemes)) {
-            $address = "{$uri->getScheme()}://{$uri->getAuthority()}";
+            $this->address = "{$uri->getScheme()}://{$uri->getAuthority()}";
         } elseif (in_array($uri->getScheme(), self::$unix_schemes)) {
-            $address = "{$uri->getScheme()}://{$uri->getPath()}";
+            $this->address = "{$uri->getScheme()}://{$uri->getPath()}";
         } else {
             throw new StreamException(StreamException::SCHEME_HANDLER, ['scheme' => $uri->getScheme()]);
         }
-        $this->stream = $this->handler->with(function () use ($address, $flags) {
+        $this->stream = $this->handler->with(function () use ($flags) {
             $error_code = $error_message = '';
-            return stream_socket_server($address, $error_code, $error_message, $flags);
+            return stream_socket_server($this->address, $error_code, $error_message, $flags);
         }, new StreamException(StreamException::SERVER_SOCKET_ERR, ['uri' => $uri->__toString()]));
         $this->evalStream();
     }
@@ -76,6 +77,28 @@ class SocketServer extends Stream
             throw new StreamException(StreamException::SERVER_CLOSED);
         }
         return stream_set_blocking($this->stream, $enable);
+    }
+
+    /**
+     * Get stream metadata as an associative array or retrieve a specific key.
+     * @param string $key Specific metadata to retrieve.
+     * @return array|mixed|null Returns an associative array if no key is
+     *     provided. Returns a specific key value if a key is provided and the
+     *     value is found, or null if the key is not found.
+     */
+    public function getMetadata($key = null)
+    {
+        if (!isset($this->stream)) {
+            return null;
+        }
+        // Add URI default for version compability
+        $meta = array_merge([
+            'uri' => $this->address,
+        ], stream_get_meta_data($this->stream));
+        if (isset($key)) {
+            return array_key_exists($key, $meta) ? $meta[$key] : null;
+        }
+        return $meta;
     }
 
 
