@@ -3,5 +3,4 @@
 docs/                  export-ignore
 Makefile               export-ignore
 phpunit.xml.dist       export-ignore
-psalm-baseline.xml     export-ignore
 tests/                 export-ignore

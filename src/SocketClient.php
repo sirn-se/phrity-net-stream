@@ -4,7 +4,6 @@ namespace Phrity\Net;
 
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\UriInterface;
-use RuntimeException;
 
 /**
  * Phrity\Net\SocketClient class.
