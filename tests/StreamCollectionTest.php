@@ -7,10 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Phrity\Net;
+namespace Phrity\Net\Test;
 
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
+use Phrity\Net\{
+    SocketServer,
+    SocketStream,
+    StreamCollection,
+    StreamException
+};
+use Phrity\Net\Uri;
 use TypeError;
 
 class StreamCollectionTest extends TestCase
@@ -32,17 +38,15 @@ class StreamCollectionTest extends TestCase
         }
 
         $readable = $collection->getReadable();
-        $this->assertCount(1, $readable);
+        $this->assertCount(2, $readable);
         foreach ($readable as $key => $item) {
-            $this->assertSame('@stream', $key);
-            $this->assertSame($stream, $item);
+            $this->assertSame($key == '@stream' ? $stream : $server, $item);
         }
 
         $writable = $collection->getWritable();
-        $this->assertCount(1, $writable);
+        $this->assertCount(2, $writable);
         foreach ($writable as $key => $item) {
-            $this->assertSame('@stream', $key);
-            $this->assertSame($stream, $item);
+            $this->assertSame($key == '@stream' ? $stream : $server, $item);
         }
 
         $changed = $collection->waitRead(10); // Should not block
@@ -70,7 +74,9 @@ class StreamCollectionTest extends TestCase
         $stream = new SocketStream($resource);
         $collection = new StreamCollection();
         $collection->attach($stream, 'my-key');
-        $this->expectException(RuntimeException::class);
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::COLLECT_KEY_CONFLICT);
+        $this->expectExceptionMessage('Stream with name "my-key" already attached.');
         $collection->attach($stream, 'my-key');
     }
 
@@ -79,5 +85,12 @@ class StreamCollectionTest extends TestCase
         $collection = new StreamCollection();
         $this->expectException(TypeError::class);
         $collection->detach(1);
+    }
+
+    public function testEmptyCollection(): void
+    {
+        $collection = new StreamCollection();
+        $changed = $collection->waitRead(10); // Should not block
+        $this->assertEmpty($changed);
     }
 }

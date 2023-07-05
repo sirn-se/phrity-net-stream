@@ -7,10 +7,15 @@
 
 declare(strict_types=1);
 
-namespace Phrity\Net;
+namespace Phrity\Net\Test;
 
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
+use Phrity\Net\{
+    SocketServer,
+    StreamException,
+    Uri
+};
+use Phrity\Net\Test\SocketServerMock;
 
 class SocketServerTest extends TestCase
 {
@@ -37,6 +42,7 @@ class SocketServerTest extends TestCase
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,
+            'uri' => 'tcp://0.0.0.0:8000',
         ], $server->getMetadata());
         $stream = $server->accept(0);
         $this->assertNull($stream); // Non-blocking, nothing to accept
@@ -58,6 +64,7 @@ class SocketServerTest extends TestCase
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,
+            'uri' => 'unix:///tmp/test.sock',
         ], $server->getMetadata());
         $stream = $server->accept(0);
         $this->assertNull($stream); // Non-blocking, nothing to accept
@@ -67,24 +74,27 @@ class SocketServerTest extends TestCase
     public function testUnsupportedScheme(): void
     {
         $uri = new Uri('http://0.0.0.0:8000');
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Scheme 'http' is not supported.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::SCHEME_TRANSPORT);
+        $this->expectExceptionMessage('Scheme "http" is not supported.');
         $server = new SocketServer($uri);
     }
 
     public function testUnknownScheme(): void
     {
         $uri = new Uri('fake://0.0.0.0:8000');
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Could not handle scheme 'fake'.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::SCHEME_HANDLER);
+        $this->expectExceptionMessage('Could not handle scheme "fake".');
         $server = new SocketServerMock($uri);
     }
 
     public function testCreateFailure(): void
     {
         $uri = new Uri('tcp://0.0.0.0');
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Could not create socket for 'tcp://0.0.0.0'.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::SERVER_SOCKET_ERR);
+        $this->expectExceptionMessage('Could not create socket for "tcp://0.0.0.0".');
         $server = new SocketServer($uri);
     }
 
@@ -100,9 +110,11 @@ class SocketServerTest extends TestCase
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,
+            'uri' => 'tcp://0.0.0.0:8000',
         ], $server->getMetadata());
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Could not accept on socket.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::SERVER_ACCEPT_ERR);
+        $this->expectExceptionMessage('Could not accept on socket.');
         $stream = $server->accept(0);
         $server->close();
     }
@@ -112,8 +124,9 @@ class SocketServerTest extends TestCase
         $uri = new Uri('tcp://0.0.0.0:8000');
         $server = new SocketServer($uri);
         $server->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Server is closed.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::SERVER_CLOSED);
+        $this->expectExceptionMessage('Server is closed.');
         $server->accept();
     }
 
@@ -122,8 +135,9 @@ class SocketServerTest extends TestCase
         $uri = new Uri('tcp://0.0.0.0:8000');
         $server = new SocketServer($uri);
         $server->close();
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Server is closed.");
+        $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::SERVER_CLOSED);
+        $this->expectExceptionMessage('Server is closed.');
         $server->setBlocking(true);
     }
 }

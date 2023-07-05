@@ -1,20 +1,14 @@
 <?php
 
-/**
- * File for Net\StreamCollection class.
- * @package Phrity > Net > Stream
- */
-
 namespace Phrity\Net;
 
 use Countable;
 use Iterator;
 use Phrity\Util\ErrorHandler;
-use RuntimeException;
 use TypeError;
 
 /**
- * Net\StreamCollection class.
+ * Phrity\Net\StreamCollection class.
  */
 class StreamCollection implements Countable, Iterator
 {
@@ -30,18 +24,19 @@ class StreamCollection implements Countable, Iterator
     }
 
 
-    // Collectors and selectors
+    // ---------- Collectors and selectors ----------------------------------------------------------------------------
 
     /**
      * Attach stream to collection.
      * @param Stream $attach Stream to attach.
      * @param string|null $key Definable name of stream.
      * @return string Name of stream.
+     * @throws StreamException If already attached.
      */
     public function attach(Stream $attach, ?string $key = null): string
     {
         if ($key && array_key_exists($key, $this->streams)) {
-            throw new RuntimeException("Stream with name '{$key}' already attached.");
+            throw new StreamException(StreamException::COLLECT_KEY_CONFLICT, ['key' => $key]);
         }
         $key = $key ?: $this->createKey();
         $this->streams[$key] = $attach;
@@ -108,6 +103,7 @@ class StreamCollection implements Countable, Iterator
      * Wait for redable content in stream collection.
      * @param int $seconds Timeout in seconds.
      * @return self New collection instance.
+     * @throws StreamException If fails to select.
      */
     public function waitRead(int $seconds = 60): self
     {
@@ -117,12 +113,15 @@ class StreamCollection implements Countable, Iterator
                 $read[$key] = $stream->getResource();
             }
         }
+        if (empty($read)) {
+            return new self(); // Nothing to select
+        }
 
         $changed = $this->handler->with(function () use ($read, $seconds) {
             $write = $oob = [];
             stream_select($read, $write, $oob, $seconds);
             return $read;
-        }, new RuntimeException('Failed to select streams for reading.'));
+        }, new StreamException(StreamException::COLLECT_SELECT_ERR));
 
         $ready = new self();
         foreach ($changed as $key => $resource) {
@@ -132,7 +131,7 @@ class StreamCollection implements Countable, Iterator
     }
 
 
-    // Countable interface implementation
+    // ---------- Countable interface implementation ------------------------------------------------------------------
 
     /**
      * Count contained streams.
@@ -144,7 +143,7 @@ class StreamCollection implements Countable, Iterator
     }
 
 
-    // Iterator interface implementation
+    // ---------- Iterator interface implementation -------------------------------------------------------------------
 
     /**
      * Return the current stream.
@@ -190,7 +189,7 @@ class StreamCollection implements Countable, Iterator
     }
 
 
-    // Protected helper methods
+    // ---------- Protected helper methods ----------------------------------------------------------------------------
 
     /**
      * Create unique key.

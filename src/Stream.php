@@ -1,22 +1,16 @@
 <?php
 
-/**
- * File for Net\Stream class.
- * @package Phrity > Net > Stream
- * @see https://www.php-fig.org/psr/psr-7/#34-psrhttpmessagestreaminterface
- */
-
 namespace Phrity\Net;
 
 use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\StreamInterface;
-use RuntimeException;
 use Throwable;
 
 /**
- * Net\Stream class.
- */
+ * Phrity\Net\Stream class.
+ * @see https://www.php-fig.org/psr/psr-7/#34-psrhttpmessagestreaminterface
+*/
 class Stream implements StreamInterface
 {
     private static $readmodes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
@@ -60,7 +54,7 @@ class Stream implements StreamInterface
         if (isset($this->stream)) {
             fclose($this->stream);
         }
-        unset($this->stream);
+        $this->stream = null;
         $this->evalStream();
     }
 
@@ -75,7 +69,7 @@ class Stream implements StreamInterface
             return null;
         }
         $stream = $this->stream;
-        unset($this->stream);
+        $this->stream = null;
         $this->evalStream();
         return $stream;
     }
@@ -102,16 +96,16 @@ class Stream implements StreamInterface
     /**
      * Returns the current position of the file read/write pointer
      * @return int Position of the file pointer
-     * @throws \RuntimeException on error.
+     * @throws \StreamException on error.
      */
     public function tell(): int
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached.');
+            throw new StreamException(StreamException::STREAM_DETACHED);
         }
         return $this->handler->with(function () {
             return ftell($this->stream);
-        }, new RuntimeException('Failed tell() on stream.'));
+        }, new StreamException(StreamException::FAIL_TELL));
     }
 
     /**
@@ -127,38 +121,38 @@ class Stream implements StreamInterface
      * Read data from the stream.
      * @param int $length Read up to $length bytes from the object and return them.
      * @return string Returns the data read from the stream, or an empty string.
-     * @throws \RuntimeException if an error occurs.
+     * @throws \StreamException if an error occurs.
      */
     public function read($length): string
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached.');
+            throw new StreamException(StreamException::STREAM_DETACHED);
         }
         if (!$this->readable) {
-            throw new RuntimeException('Stream is not readable.');
+            throw new StreamException(StreamException::NOT_READABLE);
         }
         return $this->handler->with(function () use ($length) {
-            return fread($this->stream, $length);
-        }, new RuntimeException('Failed read() on stream.'));
+            return (string)fread($this->stream, $length);
+        }, new StreamException(StreamException::FAIL_READ));
     }
 
     /**
      * Write data to the stream.
      * @param string $string The string that is to be written.
      * @return int Returns the number of bytes written to the stream.
-     * @throws \RuntimeException on failure.
+     * @throws \StreamException on failure.
      */
     public function write($string): int
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached.');
+            throw new StreamException(StreamException::STREAM_DETACHED);
         }
         if (!$this->writable) {
-            throw new RuntimeException('Stream is not writable.');
+            throw new StreamException(StreamException::NOT_WRITABLE);
         }
         return $this->handler->with(function () use ($string) {
             return fwrite($this->stream, $string);
-        }, new RuntimeException('Failed write() on stream.'));
+        }, new StreamException(StreamException::FAIL_WRITE));
     }
 
     /**
@@ -187,19 +181,19 @@ class Stream implements StreamInterface
      * Seek to a position in the stream.
      * @param int $offset Stream offset
      * @param int $whence Specifies how the cursor position will be calculated based on the seek offset.
-     * @throws \RuntimeException on failure.
+     * @throws \StreamException on failure.
      */
     public function seek($offset, $whence = SEEK_SET): void
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached.');
+            throw new StreamException(StreamException::STREAM_DETACHED);
         }
         if (!$this->seekable) {
-            throw new RuntimeException('Stream is not seekable.');
+            throw new StreamException(StreamException::NOT_SEEKABLE);
         }
         $result = fseek($this->stream, $offset, $whence);
         if ($result !== 0) {
-            throw new RuntimeException('Failed to seek.');
+            throw new StreamException(StreamException::FAIL_SEEK);
         }
     }
 
@@ -207,7 +201,6 @@ class Stream implements StreamInterface
      * Seek to the beginning of the stream.
      * If the stream is not seekable, this method will raise an exception;
      * otherwise, it will perform a seek(0).
-     * @throws \RuntimeException on failure.
      */
     public function rewind(): void
     {
@@ -235,20 +228,20 @@ class Stream implements StreamInterface
     /**
      * Returns the remaining contents in a string
      * @return string
-     * @throws \RuntimeException if unable to read.
-     * @throws \RuntimeException if error occurs while reading.
+     * @throws \StreamException if unable to read.
+     * @throws \StreamException if error occurs while reading.
      */
     public function getContents(): string
     {
         if (!isset($this->stream)) {
-            throw new RuntimeException('Stream is detached.');
+            throw new StreamException(StreamException::STREAM_DETACHED);
         }
         if (!$this->readable) {
-            throw new RuntimeException('Stream is not readable.');
+            throw new StreamException(StreamException::NOT_READABLE);
         }
         return $this->handler->with(function () {
             return stream_get_contents($this->stream);
-        }, new RuntimeException('Failed getContents() on stream.'));
+        }, new StreamException(StreamException::FAIL_CONTENTS));
     }
 
     /**
@@ -268,6 +261,9 @@ class Stream implements StreamInterface
         }
     }
 
+
+    // ---------- Extended methods ------------------------------------------------------------------------------------
+
     /**
      * Return underlying resource.
      * @return resource|null.
@@ -285,14 +281,13 @@ class Stream implements StreamInterface
      */
     protected function evalStream(): void
     {
-        $meta = $this->getMetadata();
-        if (!$meta) {
-            $this->readable = $this->writable = $this->seekable = false;
+        if ($this->stream && $meta = $this->getMetadata()) {
+            $mode = substr($meta['mode'], 0, 2);
+            $this->readable = in_array($mode, self::$readmodes);
+            $this->writable = in_array($mode, self::$writemodes);
+            $this->seekable = $meta['seekable'];
             return;
         }
-        $mode = substr($meta['mode'], 0, 2);
-        $this->readable = in_array($mode, self::$readmodes);
-        $this->writable = in_array($mode, self::$writemodes);
-        $this->seekable = $meta['seekable'];
+        $this->readable = $this->writable = $this->seekable = false;
     }
 }
