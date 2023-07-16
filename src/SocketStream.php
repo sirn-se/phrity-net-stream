@@ -105,4 +105,33 @@ class SocketStream extends Stream
             return $result === false ? null : $result;
         }, new StreamException(StreamException::FAIL_GETS));
     }
+
+    /**
+     * Closes the stream for further reading.
+     * @return void
+     */
+    public function closeRead(): void
+    {
+        if ($this->readable && $this->writable) {
+            stream_socket_shutdown($this->stream, STREAM_SHUT_RD);
+            $this->evalStream();
+        } elseif (!$this->writable) {
+            $this->close();
+        }
+        $this->readable = false;
+    }
+    /**
+     * Closes the stream for further writing.
+     * @return void
+     */
+    public function closeWrite(): void
+    {
+        if ($this->readable && $this->writable) {
+            $x = stream_socket_shutdown($this->stream, STREAM_SHUT_WR);
+            $this->evalStream();
+        } elseif (!$this->readable) {
+            $this->close();
+        }
+        $this->writable = false;
+    }
 }

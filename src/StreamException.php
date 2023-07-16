@@ -9,7 +9,7 @@ use RuntimeException;
  */
 class StreamException extends RuntimeException
 {
-    // Stream errores
+    // Stream errors
     public const STREAM_DETACHED = 1000;
     public const NOT_READABLE = 1010;
     public const NOT_WRITABLE = 1011;
