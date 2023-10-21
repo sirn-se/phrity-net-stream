@@ -68,6 +68,8 @@ class SocketStream extends Stream {
     public function setBlocking(bool $enable): bool; // Change blocking mode
     public function setTimeout(int $seconds, int $microseconds = 0): bool; // Set timeout
     public function readLine(int $length): ?string // Read a line from stream, up to $length bytes
+    public function closeRead(): void; // Closes the stream for further reading
+    public function closeWrite(): void; // Closes the stream for further writing
 }
 ```
 
@@ -173,7 +175,7 @@ class StreamFactory implements StreamFactoryInterface {
 
 ## StreamException class
 
-The `Phrity\Net\StreamException` is thrown when astream related error occurs.
+The `Phrity\Net\StreamException` is thrown when a stream related error occurs.
 
 ```php
 class StreamException extends RuntimeException {
@@ -188,6 +190,7 @@ class StreamException extends RuntimeException {
 
 | Version | PHP | |
 | --- | --- | --- |
+| `1.3` | `^7.4\|^8.0` | Closing read and write separately |
 | `1.2` | `^7.4\|^8.0` | Socket client |
 | `1.1` | `^7.4\|^8.0` | Stream collection |
 | `1.0` | `^7.4\|^8.0` | Initial version |
