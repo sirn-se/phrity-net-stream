@@ -92,4 +92,38 @@ class SocketStreamTest extends TestCase
         $this->expectExceptionMessage('Stream is not readable.');
         $stream->readLine(1024);
     }
+
+    public function testReadClose(): void
+    {
+        $factory = new StreamFactory();
+        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        $stream = $factory->createSocketStreamFromResource($resource);
+        $this->assertTrue($stream->isReadable());
+        $this->assertTrue($stream->isWritable());
+        $stream->closeRead();
+        $this->assertFalse($stream->isReadable());
+        $this->assertTrue($stream->isWritable());
+        $this->assertTrue($stream->isConnected());
+        $stream->closeWrite();
+        $this->assertFalse($stream->isReadable());
+        $this->assertFalse($stream->isWritable());
+        $this->assertFalse($stream->isConnected());
+    }
+
+    public function testWriteClose(): void
+    {
+        $factory = new StreamFactory();
+        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        $stream = $factory->createSocketStreamFromResource($resource);
+        $this->assertTrue($stream->isReadable());
+        $this->assertTrue($stream->isWritable());
+        $stream->closeWrite();
+        $this->assertTrue($stream->isReadable());
+        $this->assertFalse($stream->isWritable());
+        $this->assertTrue($stream->isConnected());
+        $stream->closeRead();
+        $this->assertFalse($stream->isReadable());
+        $this->assertFalse($stream->isWritable());
+        $this->assertFalse($stream->isConnected());
+    }
 }
