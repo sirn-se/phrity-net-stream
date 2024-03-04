@@ -22,7 +22,7 @@ class SocketStream extends Stream
      * Get name of remote socket, or null if not connected.
      * @return string|null
      */
-    public function getRemoteName(): ?string
+    public function getRemoteName(): string|null
     {
         return stream_socket_get_name($this->stream, true);
     }
@@ -31,7 +31,7 @@ class SocketStream extends Stream
      * Get name of local socket, or null if not connected.
      * @return string|null
      */
-    public function getLocalName(): ?string
+    public function getLocalName(): string|null
     {
         return stream_socket_get_name($this->stream, false);
     }
@@ -49,7 +49,7 @@ class SocketStream extends Stream
      * If stream is in blocking mode.
      * @return bool|null
      */
-    public function isBlocking(): ?bool
+    public function isBlocking(): bool|null
     {
         return $this->getMetadata('blocked');
     }
@@ -92,7 +92,7 @@ class SocketStream extends Stream
      * @return string|null Returns the data read from the stream, or null of eof.
      * @throws \StreamException if an error occurs.
      */
-    public function readLine(int $length): ?string
+    public function readLine(int $length): string|null
     {
         if (!isset($this->stream)) {
             throw new StreamException(StreamException::STREAM_DETACHED);

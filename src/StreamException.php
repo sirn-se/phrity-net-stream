@@ -62,7 +62,7 @@ class StreamException extends RuntimeException
      * @param array $data Additional data
      * @param Throwable|null $previous Previous exception
      */
-    public function __construct(int $code, array $data = [], ?Throwable $previous = null)
+    public function __construct(int $code, array $data = [], Throwable|null $previous = null)
     {
         $message = self::$messages[$code];
         foreach ($data as $key => $content) {

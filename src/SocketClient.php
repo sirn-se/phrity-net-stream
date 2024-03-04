@@ -35,7 +35,7 @@ class SocketClient
      * @param array|null $params
      * @return \Phrity\Net\SocketClient
      */
-    public function setContext(?array $options = null, ?array $params = null): self
+    public function setContext(array|null $options = null, array|null $params = null): self
     {
         $this->context = stream_context_create($options, $params);
         return $this;
@@ -57,7 +57,7 @@ class SocketClient
      * @param int|null $timeout
      * @return \Phrity\Net\SocketClient
      */
-    public function setTimeout(?int $timeout): self
+    public function setTimeout(int|null $timeout): self
     {
         $this->timeout = $timeout;
         return $this;
