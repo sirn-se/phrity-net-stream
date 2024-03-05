@@ -92,14 +92,11 @@ class StreamFactory implements StreamFactoryInterface
     /**
      * Create a new socket server.
      * @param \Psr\Http\Message\UriInterface $uri The URI to create server on.
-     * @param int $flags Flags to set on socket.
      * @return \Phrity\Net\SocketServer A socket server instance.
      */
-    public function createSocketServer(
-        UriInterface $uri,
-        int $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN
-    ): SocketServer {
-        return new SocketServer($uri, $flags);
+    public function createSocketServer(UriInterface $uri): SocketServer
+    {
+        return new SocketServer($uri);
     }
 
     /**

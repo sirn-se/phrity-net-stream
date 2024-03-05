@@ -5,13 +5,14 @@ namespace Phrity\Net;
 use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\StreamInterface;
+use Stringable;
 use Throwable;
 
 /**
  * Phrity\Net\Stream class.
  * @see https://www.php-fig.org/psr/psr-7/#34-psrhttpmessagestreaminterface
 */
-class Stream implements StreamInterface
+class Stream implements StreamInterface, Stringable
 {
     private static $readmodes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
     private static $writemodes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
@@ -24,7 +25,7 @@ class Stream implements StreamInterface
 
     /**
      * Create new stream wrapper instance
-     * @param resource $resource A stream resource to wrap
+     * @param resource $stream A stream resource to wrap
      * @throws \InvalidArgumentException If not a valid stream resource
      */
     public function __construct($stream)
@@ -35,7 +36,7 @@ class Stream implements StreamInterface
         }
         $rtype = get_resource_type($stream);
         if (!in_array($rtype, ['stream', 'persistent stream'])) {
-             throw new InvalidArgumentException("Invalid stream provided; gor resource type '{$rtype}'.");
+             throw new InvalidArgumentException("Invalid stream provided; got resource type '{$rtype}'.");
         }
         $this->stream = $stream;
         $this->handler = new ErrorHandler();
@@ -81,7 +82,7 @@ class Stream implements StreamInterface
      *     provided. Returns a specific key value if a key is provided and the
      *     value is found, or null if the key is not found.
      */
-    public function getMetadata(string $key = null)
+    public function getMetadata(string|null $key = null): mixed
     {
         if (!isset($this->stream)) {
             return null;

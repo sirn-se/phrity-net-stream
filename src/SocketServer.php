@@ -21,10 +21,9 @@ class SocketServer extends Stream
     /**
      * Create new socker server instance
      * @param \Psr\Http\Message\UriInterface $uri The URI to open socket on.
-     * @param int $flags Flags to set on socket.
      * @throws StreamException if unable to create socket.
      */
-    public function __construct(UriInterface $uri, int $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN)
+    public function __construct(UriInterface $uri)
     {
         $this->handler = new ErrorHandler();
         if (!in_array($uri->getScheme(), $this->getTransports())) {
@@ -37,8 +36,9 @@ class SocketServer extends Stream
         } else {
             throw new StreamException(StreamException::SCHEME_HANDLER, ['scheme' => $uri->getScheme()]);
         }
-        $this->stream = $this->handler->with(function () use ($flags) {
+        $this->stream = $this->handler->with(function () {
             $error_code = $error_message = '';
+            $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
             return stream_socket_server($this->address, $error_code, $error_message, $flags);
         }, new StreamException(StreamException::SERVER_SOCKET_ERR, ['uri' => $uri->__toString()]));
         $this->evalStream();

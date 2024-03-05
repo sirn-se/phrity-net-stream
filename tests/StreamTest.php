@@ -381,7 +381,7 @@ class StreamTest extends TestCase
         // We need something that is a resouce but not a "stream" resource
         $resource = stream_context_create([]);
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid stream provided; gor resource type 'stream-context'.");
+        $this->expectExceptionMessage("Invalid stream provided; got resource type 'stream-context'.");
         $stream = new Stream($resource);
     }
 }
