@@ -5,7 +5,6 @@ namespace Phrity\Net;
 use Countable;
 use Iterator;
 use Phrity\Util\ErrorHandler;
-use TypeError;
 
 /**
  * Phrity\Net\StreamCollection class.
@@ -55,7 +54,6 @@ class StreamCollection implements Countable, Iterator
                 unset($this->streams[$detach]);
                 return true;
             }
-            return false;
         }
         if ($detach instanceof Stream) {
             foreach ($this->streams as $key => $stream) {
@@ -64,9 +62,8 @@ class StreamCollection implements Countable, Iterator
                     return true;
                 }
             }
-            return false;
         }
-        throw new TypeError("Argument #1 ($detach) must be of type Phrity\Net\Stream or string.");
+        return false;
     }
 
     /**
