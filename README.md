@@ -75,9 +75,9 @@ class SocketStream extends Stream
 }
 ```
 
-## SockeClient class
+## SocketClient class
 
-The `Phrity\Net\SockeClient` class enables a client for remote socket.
+The `Phrity\Net\SocketClient` class enables a client for remote socket.
 
 ```php
 class SocketClient {
