@@ -52,7 +52,7 @@ class Stream implements StreamInterface, Stringable
      */
     public function close(): void
     {
-        if (isset($this->stream)) {
+        if (isset($this->stream) && is_resource($this->stream)) {
             fclose($this->stream);
         }
         $this->stream = null;
