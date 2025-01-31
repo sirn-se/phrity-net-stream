@@ -130,9 +130,9 @@ class ContextTest extends TestCase
 
     public function testCreateInvalidResourceError(): void
     {
-        $curl = curl_init();
+        $curl = proc_open('php', [], $pipes);
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid stream provided; got type 'object'.");
+        $this->expectExceptionMessage("Invalid stream provided; got resource type 'process'.");
         $context = new Context($curl);
     }
 
