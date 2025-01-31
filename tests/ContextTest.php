@@ -142,6 +142,7 @@ class ContextTest extends TestCase
         $context = new Context($file);
         fclose($file);
         $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::CONTEXT_SET_ERR);
         $this->expectExceptionMessage("Failed to set option/param on context.");
         $context->setOption('a', 'b', 'c');
     }
@@ -152,6 +153,7 @@ class ContextTest extends TestCase
         $context = new Context($file);
         fclose($file);
         $this->expectException(StreamException::class);
+        $this->expectExceptionCode(StreamException::CONTEXT_SET_ERR);
         $this->expectExceptionMessage("Failed to set option/param on context.");
         $context->setParam('a', 'b');
     }
