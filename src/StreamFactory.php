@@ -94,9 +94,9 @@ class StreamFactory implements StreamFactoryInterface
      * @param UriInterface $uri The URI to create server on.
      * @return SocketServer A socket server instance.
      */
-    public function createSocketServer(UriInterface $uri): SocketServer
+    public function createSocketServer(UriInterface $uri, Context|null $context = null): SocketServer
     {
-        return new SocketServer($uri);
+        return new SocketServer($uri, $context);
     }
 
     /**
