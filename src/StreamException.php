@@ -74,7 +74,7 @@ class StreamException extends RuntimeException
             $message = str_replace('{' . $key . '}', $content, $message);
         }
         if ($previous) {
-            $message .= " cause: {$previous->getMessage()}";
+            $message .= " ({$previous->getMessage()})";
         }
         parent::__construct($message, $code, $previous);
     }
