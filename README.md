@@ -48,6 +48,7 @@ class Stream implements StreamInterface
 
     // Additional methods
 
+    public function getContext(): Context; // Get stream context
     public function getResource(): resource;
 }
 ```
@@ -84,13 +85,14 @@ class SocketClient {
 
     // Constructor
 
-    public function __construct(UriInterface $uri);
+    public function __construct(UriInterface $uri, Context|null $context = null);
 
     // Methods
 
     public function setPersistent(bool $persistent): self; // If client should use persisten connection
     public function setTimeout(int|null $timeout): self; // Set timeout
-    public function setContext(array|null $options = null, array|null $params = null): self; // Set stream context
+    public function getContext(): Context; // Get stream context
+    public function setContext(Context $context): self; // Set stream context
     public function connect(): SocketStream; // Connect to remote
 }
 ```
@@ -104,15 +106,17 @@ class SocketServer extends Stream {
 
     // Constructor
 
-    public function __construct(UriInterface $uri);
+    public function __construct(UriInterface $uri, Context|null $context = null);
 
     // Methods
 
     public function accept(int|null $timeout = null): SocketStream|null; // Accept connection on socket server
     public function getTransports(): array; // Get available transports
-    public function setContext(array|null $options = null, array|null $params = null): self; // Set stream context
+    public function getContext(): Context; // Get stream context
+    public function setContext(Context $context): self; // Set stream context
     public function isBlocking(): bool|null; // If stream is blocking or not
     public function setBlocking(bool $enable): bool; // Change blocking mode
+    public function getMetadata(string|null $key = null): mixed;
 }
 ```
 
@@ -172,8 +176,8 @@ class StreamFactory implements StreamFactoryInterface
     // Additional methods
 
     public function createSocketStreamFromResource($resource): SocketStream; // Create a socket stream
-    public function createSocketClient(UriInterface $uri): SocketClient; / Create socket client
-    public function createSocketServer(UriInterface $uri): SocketServer; // Create a socket server
+    public function createSocketClient(UriInterface $uri, Context|null $context = null): SocketClient; / Create socket client
+    public function createSocketServer(UriInterface $uri, Context|null $context = null): SocketServer; // Create a socket server
     public function createStreamCollection(): StreamCollection; // Create a stream collection
 }
 ```
@@ -191,10 +195,37 @@ class StreamException extends RuntimeException {
 }
 ```
 
+## Context class
+
+The `Phrity\Net\Context` wraps context for various treams.
+
+```php
+class Context {
+
+    // Constructor
+
+    public function __construct(mixed $stream = null);
+
+    // Methods
+
+    public function getOption(string $wrapper, string $option): mixed;
+    public function getOptions(): array;
+    public function setOption(string $wrapper, string $option, mixed $value): self;
+    public function setOptions(array $options): self;
+    public function getParam(string $param): mixed;
+    public function getParams(): array;
+    public function setParam(string $param, mixed $value): self;
+    public function setParams(array $params): self;
+    public function getResource(): mixed;
+}
+```
+
 ## Versions
 
 | Version | PHP | |
 | --- | --- | --- |
+| `2.2` | `^8.1` | Improved context handling |
+| `2.1` | `^8.0` | Set context on server |
 | `2.0` | `^8.0` | Modernization |
 | `1.3` | `^7.4\|^8.0` | Closing read and write separately |
 | `1.2` | `^7.4\|^8.0` | Socket client |

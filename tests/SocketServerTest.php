@@ -11,6 +11,7 @@ namespace Phrity\Net\Test;
 
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
+    Context,
     SocketServer,
     StreamException,
     Uri
@@ -144,5 +145,17 @@ class SocketServerTest extends TestCase
         $this->expectExceptionCode(StreamException::SERVER_CLOSED);
         $this->expectExceptionMessage('Server is closed.');
         $server->setBlocking(true);
+    }
+
+    public function testContext(): void
+    {
+        $uri = new Uri('tcp://0.0.0.0:8000');
+        $context = new Context();
+        $context->setOption('a', 'b', 'c');
+        $server = new SocketServer($uri, $context);
+        $server->setContext($context);
+        $this->assertSame($context, $server->getContext());
+        $this->assertEquals('c', $server->getContext()->getOption('a', 'b'));
+        $server->close();
     }
 }

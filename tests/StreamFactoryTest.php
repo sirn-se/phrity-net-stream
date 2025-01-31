@@ -12,6 +12,7 @@ namespace Phrity\Net\Test;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
+    Context,
     SocketClient,
     SocketServer,
     SocketStream,
@@ -154,11 +155,28 @@ class StreamFactoryTest extends TestCase
         $server->close();
     }
 
+    public function testCreateSocketServerWithContext(): void
+    {
+        $url = new Uri('tcp://0.0.0.0:8000');
+        $factory = new StreamFactory();
+        $server = $factory->createSocketServer($url, new Context());
+        $this->assertInstanceOf(SocketServer::class, $server);
+        $server->close();
+    }
+
     public function testCreateSocketClient(): void
     {
         $url = new Uri('tcp://0.0.0.0:8000');
         $factory = new StreamFactory();
         $client = $factory->createSocketClient($url);
+        $this->assertInstanceOf(SocketClient::class, $client);
+    }
+
+    public function testCreateSocketClientWithContext(): void
+    {
+        $url = new Uri('tcp://0.0.0.0:8000');
+        $factory = new StreamFactory();
+        $client = $factory->createSocketClient($url, new Context());
         $this->assertInstanceOf(SocketClient::class, $client);
     }
 

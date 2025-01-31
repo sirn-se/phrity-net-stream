@@ -6,6 +6,7 @@ namespace Phrity\Net\Test;
 
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
+    Context,
     SocketClient,
     SocketStream,
     StreamException,
@@ -37,5 +38,22 @@ class SocketClientTest extends TestCase
         $this->expectExceptionCode(StreamException::CLIENT_CONNECT_ERR);
         $this->expectExceptionMessage('Client could not connect to "tcp://localhost:80".');
         $client->connect();
+    }
+
+    public function testContext(): void
+    {
+        $uri = new Uri('tcp://www.php.net:80');
+        $context = new Context();
+        $context->setOption('a', 'b', 'c');
+        $client = new SocketClient($uri, $context);
+        $this->assertSame($context, $client->getContext());
+        $this->assertEquals('c', $client->getContext()->getOption('a', 'b'));
+        $client->setContext($context);
+        $this->assertSame($context, $client->getContext());
+        $this->assertEquals('c', $client->getContext()->getOption('a', 'b'));
+        $stream = $client->connect();
+        $this->assertNotSame($context, $stream->getContext());
+        $this->assertEquals('c', $stream->getContext()->getOption('a', 'b'));
+        $stream->close();
     }
 }
