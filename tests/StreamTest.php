@@ -12,6 +12,7 @@ namespace Phrity\Net\Test;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
+    Context,
     Stream,
     StreamFactory,
     StreamException
@@ -355,6 +356,16 @@ class StreamTest extends TestCase
         $this->assertFalse($stream->isWritable());
         $this->assertTrue($stream->isReadable());
 
+        $stream->close();
+    }
+
+    public function testContext(): void
+    {
+        $remote = fopen('https://phrity.sirn.se/', 'r');
+        $stream = new Stream($remote);
+        $context = $stream->getContext();
+        $this->assertInstanceOf(Context::class, $context);
+        $this->assertEquals([], $context->getOptions());
         $stream->close();
     }
 

@@ -7,23 +7,24 @@ use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\UriInterface;
 
 /**
- * Phrity\Net\SocketServer class.
+ * SocketServer class.
  */
 class SocketServer extends Stream
 {
-    private static $internet_schemes = ['tcp', 'udp', 'tls', 'ssl'];
-    private static $unix_schemes = ['unix', 'udg'];
+    private static array $internet_schemes = ['tcp', 'udp', 'tls', 'ssl'];
+    private static array $unix_schemes = ['unix', 'udg'];
 
-    protected $handler;
-    protected $address;
+    protected ErrorHandler $handler;
+    protected string $address;
     protected $stream;
+    protected Context $context;
 
     /**
      * Create new socker server instance
-     * @param \Psr\Http\Message\UriInterface $uri The URI to open socket on.
+     * @param UriInterface $uri The URI to open socket on.
      * @throws StreamException if unable to create socket.
      */
-    public function __construct(UriInterface $uri)
+    public function __construct(UriInterface $uri, Context|null $context = null)
     {
         $this->handler = new ErrorHandler();
         if (!in_array($uri->getScheme(), $this->getTransports())) {
@@ -36,10 +37,16 @@ class SocketServer extends Stream
         } else {
             throw new StreamException(StreamException::SCHEME_HANDLER, ['scheme' => $uri->getScheme()]);
         }
+        $this->context = $context ?? new Context();
         $this->stream = $this->handler->with(function () {
             $error_code = $error_message = '';
-            $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
-            return stream_socket_server($this->address, $error_code, $error_message, $flags);
+            return stream_socket_server(
+                $this->address,
+                $error_code,
+                $error_message,
+                STREAM_SERVER_BIND | STREAM_SERVER_LISTEN,
+                $this->context->getResource()
+            );
         }, new StreamException(StreamException::SERVER_SOCKET_ERR, ['uri' => $uri->__toString()]));
         $this->evalStream();
     }
@@ -49,19 +56,26 @@ class SocketServer extends Stream
 
     /**
      * Set stream context.
-     * @param array|null $options
+     * @param Context|array|null $options
      * @param array|null $params
-     * @return \Phrity\Net\SocketServer
+     * @return static
      */
-    public function setContext(array|null $options = null, array|null $params = null): self
+    public function setContext(Context|array|null $options = null, array|null $params = null): self
     {
-        foreach ($options ?? [] as $wrapper => $wrapperOptions) {
-            foreach ($wrapperOptions ?? [] as $option => $value) {
-                stream_context_set_option($this->stream, $wrapper, $option, $value);
-            }
+        if ($options instanceof Context) {
+            $this->context = $options;
+            return $this;
         }
-        stream_context_set_params($this->stream, $params ?? []);
+        // @deprecated
+        // @todo Add deprecation warning
+        $this->context->setOptions($options ?? []);
+        $this->context->setParams($params ?? []);
         return $this;
+    }
+
+    public function getContext(): Context
+    {
+        return $this->context;
     }
 
     /**
@@ -103,7 +117,7 @@ class SocketServer extends Stream
      *     provided. Returns a specific key value if a key is provided and the
      *     value is found, or null if the key is not found.
      */
-    public function getMetadata($key = null): mixed
+    public function getMetadata(string|null $key = null): mixed
     {
         if (!isset($this->stream)) {
             return null;
@@ -124,7 +138,7 @@ class SocketServer extends Stream
     /**
      * Accept a connection on a socket.
      * @param int|null $timeout Override the default socket accept timeout.
-     * @return Phrity\Net\SocketStream|null The stream for opened conenction.
+     * @return SocketStream|null The stream for opened conenction.
      * @throws StreamException if socket is closed
      */
     public function accept(int|null $timeout = null): SocketStream|null

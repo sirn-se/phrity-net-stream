@@ -3,7 +3,7 @@
 namespace Phrity\Net;
 
 /**
- * Phrity\Net\SocketStream class.
+ * SocketStream class.
  */
 class SocketStream extends Stream
 {
@@ -58,7 +58,7 @@ class SocketStream extends Stream
      * Toggle blocking/non-blocking mode.
      * @param bool $enable Blocking mode to set.
      * @return bool If operation was succesful.
-     * @throws \StreamException if stream is closed.
+     * @throws StreamException if stream is closed.
      */
     public function setBlocking(bool $enable): bool
     {
@@ -73,7 +73,7 @@ class SocketStream extends Stream
      * @param int $seconds Seconds to be set.
      * @param int $microseconds Microseconds to be set.
      * @return bool If operation was succesful.
-     * @throws \StreamException if stream is closed.
+     * @throws StreamException if stream is closed.
      */
     public function setTimeout(int $seconds, int $microseconds = 0): bool
     {
@@ -90,7 +90,7 @@ class SocketStream extends Stream
      * Read line from the stream.
      * @param int $length Read up to $length bytes from the object and return them.
      * @return string|null Returns the data read from the stream, or null of eof.
-     * @throws \StreamException if an error occurs.
+     * @throws StreamException if an error occurs.
      */
     public function readLine(int $length): string|null
     {

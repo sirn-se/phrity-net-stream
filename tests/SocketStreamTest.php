@@ -11,6 +11,7 @@ namespace Phrity\Net\Test;
 
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
+    Context,
     SocketStream,
     StreamFactory,
     StreamException
@@ -125,5 +126,16 @@ class SocketStreamTest extends TestCase
         $this->assertFalse($stream->isReadable());
         $this->assertFalse($stream->isWritable());
         $this->assertFalse($stream->isConnected());
+    }
+
+    public function testContext(): void
+    {
+        $factory = new StreamFactory();
+        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        $stream = $factory->createSocketStreamFromResource($resource);
+        $context = $stream->getContext();
+        $this->assertInstanceOf(Context::class, $context);
+        $this->assertEquals([], $context->getOptions());
+        $stream->close();
     }
 }

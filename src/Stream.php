@@ -14,19 +14,20 @@ use Throwable;
 */
 class Stream implements StreamInterface, Stringable
 {
-    private static $readmodes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
-    private static $writemodes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
+    private static array $readmodes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
+    private static array $writemodes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
 
     protected $stream;
-    protected $handler;
-    protected $readable = false;
-    protected $writable = false;
-    protected $seekable = false;
+    protected Context $context;
+    protected ErrorHandler $handler;
+    protected bool $readable = false;
+    protected bool $writable = false;
+    protected bool $seekable = false;
 
     /**
      * Create new stream wrapper instance
      * @param resource $stream A stream resource to wrap
-     * @throws \InvalidArgumentException If not a valid stream resource
+     * @throws InvalidArgumentException If not a valid stream resource
      */
     public function __construct($stream)
     {
@@ -39,6 +40,7 @@ class Stream implements StreamInterface, Stringable
              throw new InvalidArgumentException("Invalid stream provided; got resource type '{$rtype}'.");
         }
         $this->stream = $stream;
+        $this->context = new Context($this->stream);
         $this->handler = new ErrorHandler();
         $this->evalStream();
     }
@@ -64,7 +66,7 @@ class Stream implements StreamInterface, Stringable
      * After the stream has been detached, the stream is in an unusable state.
      * @return resource|null Underlying stream, if any
      */
-    public function detach()
+    public function detach(): mixed
     {
         if (!isset($this->stream)) {
             return null;
@@ -97,7 +99,7 @@ class Stream implements StreamInterface, Stringable
     /**
      * Returns the current position of the file read/write pointer
      * @return int Position of the file pointer
-     * @throws \StreamException on error.
+     * @throws StreamException on error.
      */
     public function tell(): int
     {
@@ -122,7 +124,7 @@ class Stream implements StreamInterface, Stringable
      * Read data from the stream.
      * @param int $length Read up to $length bytes from the object and return them.
      * @return string Returns the data read from the stream, or an empty string.
-     * @throws \StreamException if an error occurs.
+     * @throws StreamException if an error occurs.
      */
     public function read(int $length): string
     {
@@ -141,7 +143,7 @@ class Stream implements StreamInterface, Stringable
      * Write data to the stream.
      * @param string $string The string that is to be written.
      * @return int Returns the number of bytes written to the stream.
-     * @throws \StreamException on failure.
+     * @throws StreamException on failure.
      */
     public function write(string $string): int
     {
@@ -166,7 +168,7 @@ class Stream implements StreamInterface, Stringable
             return null;
         }
         $stats = fstat($this->stream);
-        return $stats && array_key_exists('size', $stats) ? $stats['size'] : null;
+        return $stats['size'] ?? null;
     }
 
     /**
@@ -182,7 +184,7 @@ class Stream implements StreamInterface, Stringable
      * Seek to a position in the stream.
      * @param int $offset Stream offset
      * @param int $whence Specifies how the cursor position will be calculated based on the seek offset.
-     * @throws \StreamException on failure.
+     * @throws StreamException on failure.
      */
     public function seek(int $offset, int $whence = SEEK_SET): void
     {
@@ -229,8 +231,8 @@ class Stream implements StreamInterface, Stringable
     /**
      * Returns the remaining contents in a string
      * @return string
-     * @throws \StreamException if unable to read.
-     * @throws \StreamException if error occurs while reading.
+     * @throws StreamException if unable to read.
+     * @throws StreamException if error occurs while reading.
      */
     public function getContents(): string
     {
@@ -266,10 +268,19 @@ class Stream implements StreamInterface, Stringable
     // ---------- Extended methods ------------------------------------------------------------------------------------
 
     /**
-     * Return underlying resource.
-     * @return resource|null.
+     * Return context for stream.
+     * @return Context
      */
-    public function getResource()
+    public function getContext(): Context
+    {
+        return $this->context;
+    }
+
+    /**
+     * Return underlying resource.
+     * @return resource|null
+     */
+    public function getResource(): mixed
     {
         return $this->stream;
     }

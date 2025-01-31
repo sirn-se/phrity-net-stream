@@ -3,9 +3,10 @@
 namespace Phrity\Net;
 
 use RuntimeException;
+use Throwable;
 
 /**
- * Phrity\Net\StreamException class.
+ * StreamException class.
  */
 class StreamException extends RuntimeException
 {
@@ -35,7 +36,10 @@ class StreamException extends RuntimeException
     public const COLLECT_KEY_CONFLICT = 4000;
     public const COLLECT_SELECT_ERR = 4001;
 
-    private static $messages = [
+    // Context errors
+    public const CONTEXT_SET_ERR = 5000;
+
+    private static array $messages = [
         self::STREAM_DETACHED => 'Stream is detached.',
         self::NOT_READABLE => 'Stream is not readable.',
         self::NOT_WRITABLE => 'Stream is not writable.',
@@ -54,6 +58,7 @@ class StreamException extends RuntimeException
         self::SERVER_ACCEPT_ERR => 'Could not accept on socket.',
         self::COLLECT_KEY_CONFLICT => 'Stream with name "{key}" already attached.',
         self::COLLECT_SELECT_ERR => 'Failed to select streams for reading.',
+        self::CONTEXT_SET_ERR => 'Failed to set option/param on context.',
     ];
 
     /**

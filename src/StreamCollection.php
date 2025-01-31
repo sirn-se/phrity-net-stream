@@ -8,12 +8,12 @@ use Iterator;
 use Phrity\Util\ErrorHandler;
 
 /**
- * Phrity\Net\StreamCollection class.
+ * StreamCollection class.
  */
 class StreamCollection implements Countable, Iterator
 {
-    protected $handler;
-    private $streams = [];
+    protected ErrorHandler $handler;
+    private array $streams = [];
 
     /**
      * Create new stream collection instance.
@@ -147,7 +147,7 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Return the current stream.
-     * @return mixed Current stream.
+     * @return Stream Current stream.
      */
     public function current(): Stream
     {
@@ -156,7 +156,7 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Return the key of the current stream.
-     * @return scalar|null Current key.
+     * @return string Current key.
      */
     public function key(): string
     {
