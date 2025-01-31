@@ -153,6 +153,7 @@ class SocketServerTest extends TestCase
         $context = new Context();
         $context->setOption('a', 'b', 'c');
         $server = new SocketServer($uri, $context);
+        $server->setContext($context);
         $this->assertSame($context, $server->getContext());
         $this->assertEquals('c', $server->getContext()->getOption('a', 'b'));
         $server->close();

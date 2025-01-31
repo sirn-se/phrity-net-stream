@@ -119,13 +119,21 @@ class ContextTest extends TestCase
         $context = new Context("hello");
     }
 
-    public function testCreateInvalidResourceError(): void
+    public function testCreateClosedResourceError(): void
     {
         $file = fopen(__DIR__ . '/fixtures/stream-readonly.txt', 'r');
         fclose($file);
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid stream provided; got type 'resource (closed)'.");
         $context = new Context($file);
+    }
+
+    public function testCreateInvalidResourceError(): void
+    {
+        $curl = curl_init();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid stream provided; got type 'object'.");
+        $context = new Context($curl);
     }
 
     public function testSetOptionError(): void
