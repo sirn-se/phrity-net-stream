@@ -3,6 +3,7 @@
 namespace Phrity\Net;
 
 use ErrorException;
+use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\UriInterface;
 
@@ -140,12 +141,15 @@ class SocketServer extends Stream
 
     /**
      * Accept a connection on a socket.
-     * @param int|null $timeout Override the default socket accept timeout.
+     * @param int<0, max>|float|null $timeout Override the default socket accept timeout.
      * @return SocketStream|null The stream for opened conenction.
      * @throws StreamException if socket is closed
      */
-    public function accept(int|null $timeout = null): SocketStream|null
+    public function accept(int|float|null $timeout = null): SocketStream|null
     {
+        if (!is_null($timeout) && $timeout < 0) {
+            throw new InvalidArgumentException("Timeout must be 0 or more.");
+        }
         if (!is_resource($this->stream)) {
             throw new StreamException(StreamException::SERVER_CLOSED);
         }

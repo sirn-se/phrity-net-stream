@@ -69,7 +69,7 @@ class SocketStream extends Stream
     public function getResourceType(): string; // Get resource type
     public function isBlocking(): bool|null; // If stream is blocking or not
     public function setBlocking(bool $enable): bool; // Change blocking mode
-    public function setTimeout(int $seconds, int $microseconds = 0): bool; // Set timeout
+    public function setTimeout(int|float $timeout): bool; // Set timeout
     public function readLine(int $length): string|null; // Read a line from stream, up to $length bytes
     public function closeRead(): void; // Closes the stream for further reading
     public function closeWrite(): void; // Closes the stream for further writing
@@ -90,7 +90,7 @@ class SocketClient {
     // Methods
 
     public function setPersistent(bool $persistent): self; // If client should use persisten connection
-    public function setTimeout(int|null $timeout): self; // Set timeout
+    public function setTimeout(int|float|null $timeout): self; // Set timeout
     public function getContext(): Context; // Get stream context
     public function setContext(Context $context): self; // Set stream context
     public function connect(): SocketStream; // Connect to remote
@@ -110,7 +110,7 @@ class SocketServer extends Stream {
 
     // Methods
 
-    public function accept(int|null $timeout = null): SocketStream|null; // Accept connection on socket server
+    public function accept(int|float|null $timeout = null): SocketStream|null; // Accept connection on socket server
     public function getTransports(): array; // Get available transports
     public function getContext(): Context; // Get stream context
     public function setContext(Context $context): self; // Set stream context
@@ -138,7 +138,7 @@ class StreamCollection implements Countable, Iterator
     public function detach(Stream|string $detach): bool; // Detach stream from collection
     public function getReadable(): self; // Get collection of readable streams
     public function getWritable(): self; // Get collection of writable streams
-    public function waitRead(int $seconds = 60): self; // Wait for and get collection of streams with data to read
+    public function waitRead(int|float $timeout = 60): self; // Wait for and get collection of streams with data to read
 
     // Countable interface implementation
 
@@ -224,6 +224,7 @@ class Context {
 
 | Version | PHP | |
 | --- | --- | --- |
+| `2.3` | `^8.1` | Float timeout |
 | `2.2` | `^8.1` | Improved context handling |
 | `2.1` | `^8.0` | Set context on server |
 | `2.0` | `^8.0` | Modernization |

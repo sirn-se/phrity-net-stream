@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     SocketServer,
@@ -23,7 +24,7 @@ class StreamCollectionTest extends TestCase
 {
     public function testCollection(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8020');
         $server = new SocketServer($uri);
         /** @var resource $resource */
         $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
@@ -68,6 +69,15 @@ class StreamCollectionTest extends TestCase
         /* @phpstan-ignore method.alreadyNarrowedType */
         $this->assertIsString($collection->attach($stream));
         $this->assertCount(1, $collection);
+    }
+
+    public function testInvalidTimeout(): void
+    {
+        $collection = new StreamCollection();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Timeout must be 0 or more.');
+        $collection->waitRead(-1);
     }
 
     public function testAttachError(): void

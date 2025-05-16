@@ -2,6 +2,8 @@
 
 namespace Phrity\Net;
 
+use InvalidArgumentException;
+
 /**
  * SocketStream class.
  */
@@ -70,16 +72,23 @@ class SocketStream extends Stream
 
     /**
      * Set timeout period on a stream.
-     * @param int $seconds Seconds to be set.
-     * @param int $microseconds Microseconds to be set.
+     * @param int<0, max>|float $timeout Seconds to be set.
+     * @param int|null $microseconds Microseconds to be set.
      * @return bool If operation was succesful.
      * @throws StreamException if stream is closed.
      */
-    public function setTimeout(int $seconds, int $microseconds = 0): bool
+    public function setTimeout(int|float $timeout, int|null $microseconds = null): bool
     {
+        // @deprecated Setting $microseconds is deprecated, use float value on $timeout instead
+        // @todo Add deprecation warning
+        if ($timeout < 0) {
+            throw new InvalidArgumentException("Timeout must be 0 or more.");
+        }
         if (!isset($this->stream)) {
             throw new StreamException(StreamException::STREAM_DETACHED);
         }
+        $seconds = intval($timeout);
+        $microseconds = $microseconds ?? intval(round($timeout - $seconds, 6) * 1000000);
         return stream_set_timeout($this->stream, $seconds, $microseconds);
     }
 

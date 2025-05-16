@@ -162,7 +162,7 @@ class StreamFactoryTest extends TestCase
 
     public function testCreateSocketServer(): void
     {
-        $url = new Uri('tcp://0.0.0.0:8000');
+        $url = new Uri('tcp://0.0.0.0:8010');
         $factory = new StreamFactory();
         $server = $factory->createSocketServer($url);
         $this->assertInstanceOf(SocketServer::class, $server);
@@ -171,7 +171,7 @@ class StreamFactoryTest extends TestCase
 
     public function testCreateSocketServerWithContext(): void
     {
-        $url = new Uri('tcp://0.0.0.0:8000');
+        $url = new Uri('tcp://0.0.0.0:8011');
         $factory = new StreamFactory();
         $server = $factory->createSocketServer($url, new Context());
         $this->assertInstanceOf(SocketServer::class, $server);
@@ -180,7 +180,7 @@ class StreamFactoryTest extends TestCase
 
     public function testCreateSocketClient(): void
     {
-        $url = new Uri('tcp://0.0.0.0:8000');
+        $url = new Uri('tcp://0.0.0.0:8012');
         $factory = new StreamFactory();
         $client = $factory->createSocketClient($url);
         $this->assertInstanceOf(SocketClient::class, $client);
@@ -188,7 +188,7 @@ class StreamFactoryTest extends TestCase
 
     public function testCreateSocketClientWithContext(): void
     {
-        $url = new Uri('tcp://0.0.0.0:8000');
+        $url = new Uri('tcp://0.0.0.0:8013');
         $factory = new StreamFactory();
         $client = $factory->createSocketClient($url, new Context());
         $this->assertInstanceOf(SocketClient::class, $client);

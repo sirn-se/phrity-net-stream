@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     Context,
@@ -72,7 +73,7 @@ class SocketServerTest extends TestCase
             'seekable' => false,
             'uri' => 'unix:///tmp/test.sock',
         ], $server->getMetadata());
-        $stream = $server->accept(0);
+        $stream = $server->accept(0.01);
         $this->assertNull($stream); // Non-blocking, nothing to accept
         $server->close();
     }
@@ -102,6 +103,15 @@ class SocketServerTest extends TestCase
         $this->expectExceptionCode(StreamException::SERVER_SOCKET_ERR);
         $this->expectExceptionMessage('Could not create socket for "tcp://0.0.0.0".');
         $server = new SocketServer($uri);
+    }
+
+    public function testInvalidTimeout(): void
+    {
+        $uri = new Uri('tcp://0.0.0.0:8000');
+        $server = new SocketServer($uri);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Timeout must be 0 or more.');
+        $server->accept(-1);
     }
 
     public function testBlockingServerTimeout(): void

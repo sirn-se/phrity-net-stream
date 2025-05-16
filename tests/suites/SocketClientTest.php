@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     Context,
@@ -38,6 +39,16 @@ class SocketClientTest extends TestCase
         $this->expectExceptionCode(StreamException::CLIENT_CONNECT_ERR);
         $this->expectExceptionMessage('Client could not connect to "tcp://localhost:80".');
         $client->connect();
+    }
+
+    public function testInvalidTimeout(): void
+    {
+        $uri = new Uri('tcp://www.php.net:80');
+        $client = new SocketClient($uri);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Timeout must be 0 or more.');
+        $client->setTimeout(-1);
     }
 
     public function testContext(): void

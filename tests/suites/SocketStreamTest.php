@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     Context,
@@ -35,7 +36,19 @@ class SocketStreamTest extends TestCase
         $this->assertTrue($stream->setBlocking(false));
         $this->assertFalse($stream->isBlocking());
 
-        $this->assertFalse($stream->setTimeout(1, 2));
+        $this->assertFalse($stream->setTimeout(1.2));
+    }
+
+    public function testInvalidTimeout(): void
+    {
+        $factory = new StreamFactory();
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
+        $stream = $factory->createSocketStreamFromResource($resource);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Timeout must be 0 or more.');
+        $stream->setTimeout(-1);
     }
 
     public function testSetBlockingOnClosed(): void
@@ -63,7 +76,7 @@ class SocketStreamTest extends TestCase
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::STREAM_DETACHED);
         $this->expectExceptionMessage('Stream is detached.');
-        $stream->setTimeout(1, 2);
+        $stream->setTimeout(1);
     }
 
     public function testReadLine(): void
