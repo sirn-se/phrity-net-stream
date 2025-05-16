@@ -9,10 +9,12 @@ use Phrity\Util\ErrorHandler;
 
 /**
  * StreamCollection class.
+ * @implements Iterator<string, Stream>
  */
 class StreamCollection implements Countable, Iterator
 {
     protected ErrorHandler $handler;
+    /** @var array<string, Stream> */
     private array $streams = [];
 
     /**
@@ -117,6 +119,7 @@ class StreamCollection implements Countable, Iterator
 
         $changed = $this->handler->with(function () use ($read, $seconds) {
             $write = $oob = [];
+            /** @phpstan-ignore argument.type */
             stream_select($read, $write, $oob, $seconds);
             return $read;
         }, function (ErrorException $error) {
@@ -147,18 +150,18 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Return the current stream.
-     * @return Stream Current stream.
+     * @return Stream|null Current stream.
      */
-    public function current(): Stream
+    public function current(): Stream|null
     {
-        return current($this->streams);
+        return current($this->streams) ?: null;
     }
 
     /**
      * Return the key of the current stream.
      * @return string Current key.
      */
-    public function key(): string
+    public function key(): string|null
     {
         return key($this->streams);
     }
@@ -185,7 +188,7 @@ class StreamCollection implements Countable, Iterator
      */
     public function valid(): bool
     {
-        return array_key_exists(key($this->streams), $this->streams);
+        return array_key_exists(key($this->streams) ?? -1, $this->streams);
     }
 
 

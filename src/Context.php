@@ -11,6 +11,7 @@ use Throwable;
  */
 class Context
 {
+    /** @var resource */
     private $stream;
 
     /**
@@ -39,6 +40,9 @@ class Context
         return stream_context_get_options($this->stream)[$wrapper][$option] ?? null;
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function getOptions(): array
     {
         return stream_context_get_options($this->stream);
@@ -52,6 +56,9 @@ class Context
         return $this;
     }
 
+    /**
+     * @param array<string, array<string, mixed>> $options
+     */
     public function setOptions(array $options): self
     {
         foreach ($options as $wrapper => $wrapperOptions) {
@@ -67,6 +74,9 @@ class Context
         return stream_context_get_params($this->stream)[$param] ?? null;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getParams(): array
     {
         return stream_context_get_params($this->stream);
@@ -78,6 +88,9 @@ class Context
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function setParams(array $params): self
     {
         /** @phpstan-ignore booleanNot.alwaysFalse */

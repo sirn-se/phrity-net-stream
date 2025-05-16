@@ -32,8 +32,8 @@ class SocketClient
 
     /**
      * Set stream context.
-     * @param Context|array|null $options
-     * @param array|null $params
+     * @param Context|array<string, array<string, mixed>>|null $options
+     * @param array<string, mixed>|null $params
      * @return SocketClient
      */
     public function setContext(Context|array|null $options = null, array|null $params = null): self

@@ -39,6 +39,7 @@ class StreamException extends RuntimeException
     // Context errors
     public const CONTEXT_SET_ERR = 5000;
 
+    /** @var array<int, string> */
     private static array $messages = [
         self::STREAM_DETACHED => 'Stream is detached.',
         self::NOT_READABLE => 'Stream is not readable.',
@@ -64,7 +65,7 @@ class StreamException extends RuntimeException
     /**
      * Create exception.
      * @param int $code Error code
-     * @param array $data Additional data
+     * @param array<string, mixed> $data Additional data
      * @param Throwable|null $previous Previous exception
      */
     public function __construct(int $code, array $data = [], Throwable|null $previous = null)

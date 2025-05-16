@@ -79,7 +79,7 @@ class SocketServerTest extends TestCase
 
     public function testUnsupportedScheme(): void
     {
-        $uri = new Uri('http://0.0.0.0:8000');
+        $uri = new Uri('http://0.0.0.0:8001');
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::SCHEME_TRANSPORT);
         $this->expectExceptionMessage('Scheme "http" is not supported.');
@@ -88,7 +88,7 @@ class SocketServerTest extends TestCase
 
     public function testUnknownScheme(): void
     {
-        $uri = new Uri('fake://0.0.0.0:8000');
+        $uri = new Uri('fake://0.0.0.0:8002');
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::SCHEME_HANDLER);
         $this->expectExceptionMessage('Could not handle scheme "fake".');
@@ -106,7 +106,7 @@ class SocketServerTest extends TestCase
 
     public function testBlockingServerTimeout(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8003');
         $server = new SocketServer($uri);
         $this->assertEquals([
             'timed_out' => false,
@@ -116,7 +116,7 @@ class SocketServerTest extends TestCase
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,
-            'uri' => 'tcp://0.0.0.0:8000',
+            'uri' => 'tcp://0.0.0.0:8003',
         ], $server->getMetadata());
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::SERVER_ACCEPT_ERR);
@@ -127,7 +127,7 @@ class SocketServerTest extends TestCase
 
     public function testAcceptOnClosedError(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8004');
         $server = new SocketServer($uri);
         $server->close();
         $this->expectException(StreamException::class);
@@ -138,7 +138,7 @@ class SocketServerTest extends TestCase
 
     public function testSetBlockingOnClosedError(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8005');
         $server = new SocketServer($uri);
         $server->close();
         $this->expectException(StreamException::class);
@@ -149,7 +149,7 @@ class SocketServerTest extends TestCase
 
     public function testContext(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8006');
         $context = new Context();
         $context->setOption('a', 'b', 'c');
         $server = new SocketServer($uri, $context);

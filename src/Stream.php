@@ -14,9 +14,12 @@ use Throwable;
 */
 class Stream implements StreamInterface, Stringable
 {
+    /** @var array<string> */
     private static array $readmodes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
+    /** @var array<string> */
     private static array $writemodes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
 
+    /** @var resource|null */
     protected $stream;
     protected Context $context;
     protected ErrorHandler $handler;
@@ -54,7 +57,7 @@ class Stream implements StreamInterface, Stringable
      */
     public function close(): void
     {
-        if (isset($this->stream) && is_resource($this->stream)) {
+        if (is_resource($this->stream)) {
             fclose($this->stream);
         }
         $this->stream = null;
@@ -103,11 +106,8 @@ class Stream implements StreamInterface, Stringable
      */
     public function tell(): int
     {
-        if (!isset($this->stream)) {
-            throw new StreamException(StreamException::STREAM_DETACHED);
-        }
         return $this->handler->with(function () {
-            return ftell($this->stream);
+            return ftell($this->getOpenResource());
         }, new StreamException(StreamException::FAIL_TELL));
     }
 
@@ -122,20 +122,21 @@ class Stream implements StreamInterface, Stringable
 
     /**
      * Read data from the stream.
-     * @param int $length Read up to $length bytes from the object and return them.
+     * @param int<1, max> $length Read up to $length bytes from the object and return them.
      * @return string Returns the data read from the stream, or an empty string.
      * @throws StreamException if an error occurs.
      */
     public function read(int $length): string
     {
-        if (!isset($this->stream)) {
-            throw new StreamException(StreamException::STREAM_DETACHED);
+        if ($length < 1) {
+            throw new InvalidArgumentException("Must read minimum 1 byte");
         }
+        $stream = $this->getOpenResource();
         if (!$this->readable) {
             throw new StreamException(StreamException::NOT_READABLE);
         }
-        return $this->handler->with(function () use ($length) {
-            return (string)fread($this->stream, $length);
+        return $this->handler->with(function () use ($stream, $length) {
+            return (string)fread($stream, $length);
         }, new StreamException(StreamException::FAIL_READ));
     }
 
@@ -147,14 +148,12 @@ class Stream implements StreamInterface, Stringable
      */
     public function write(string $string): int
     {
-        if (!isset($this->stream)) {
-            throw new StreamException(StreamException::STREAM_DETACHED);
-        }
+        $stream = $this->getOpenResource();
         if (!$this->writable) {
             throw new StreamException(StreamException::NOT_WRITABLE);
         }
-        return $this->handler->with(function () use ($string) {
-            return fwrite($this->stream, $string);
+        return $this->handler->with(function () use ($stream, $string) {
+            return fwrite($stream, $string);
         }, new StreamException(StreamException::FAIL_WRITE));
     }
 
@@ -164,7 +163,7 @@ class Stream implements StreamInterface, Stringable
      */
     public function getSize(): int|null
     {
-        if (!isset($this->stream)) {
+        if (!is_resource($this->stream)) {
             return null;
         }
         $stats = fstat($this->stream);
@@ -188,13 +187,11 @@ class Stream implements StreamInterface, Stringable
      */
     public function seek(int $offset, int $whence = SEEK_SET): void
     {
-        if (!isset($this->stream)) {
-            throw new StreamException(StreamException::STREAM_DETACHED);
-        }
+        $stream = $this->getOpenResource();
         if (!$this->seekable) {
             throw new StreamException(StreamException::NOT_SEEKABLE);
         }
-        $result = fseek($this->stream, $offset, $whence);
+        $result = fseek($stream, $offset, $whence);
         if ($result !== 0) {
             throw new StreamException(StreamException::FAIL_SEEK);
         }
@@ -236,14 +233,12 @@ class Stream implements StreamInterface, Stringable
      */
     public function getContents(): string
     {
-        if (!isset($this->stream)) {
-            throw new StreamException(StreamException::STREAM_DETACHED);
-        }
+        $stream = $this->getOpenResource();
         if (!$this->readable) {
             throw new StreamException(StreamException::NOT_READABLE);
         }
-        return $this->handler->with(function () {
-            return stream_get_contents($this->stream);
+        return $this->handler->with(function () use ($stream) {
+            return stream_get_contents($stream);
         }, new StreamException(StreamException::FAIL_CONTENTS));
     }
 
@@ -301,5 +296,18 @@ class Stream implements StreamInterface, Stringable
             return;
         }
         $this->readable = $this->writable = $this->seekable = false;
+    }
+
+    /**
+     * Return underlying resource.
+     * @return resource
+     * @throws StreamException if closed.
+     */
+    protected function getOpenResource(): mixed
+    {
+        if (!is_resource($this->stream)) {
+            throw new StreamException(StreamException::STREAM_DETACHED);
+        }
+        return $this->stream;
     }
 }

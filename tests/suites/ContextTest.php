@@ -17,6 +17,7 @@ class ContextTest extends TestCase
     {
         $context = new Context();
         $options = $context->getOptions();
+        /* @phpstan-ignore method.alreadyNarrowedType */
         $this->assertIsArray($options);
         $this->assertEmpty($options);
         $context->setOptions([
@@ -64,6 +65,7 @@ class ContextTest extends TestCase
     {
         $context = new Context();
         $params = $context->getParams();
+        /* @phpstan-ignore method.alreadyNarrowedType */
         $this->assertIsArray($params);
         $this->assertEquals(['options' => []], $params);
         $context->setParams([
@@ -107,7 +109,8 @@ class ContextTest extends TestCase
 
     public function testCreateWithStream(): void
     {
-        $file = fopen(__DIR__ . '/fixtures/stream-readonly.txt', 'r');
+        /** @var resource $file */
+        $file = fopen(__DIR__ . '/../fixtures/stream-readonly.txt', 'r');
         $context = new Context($file);
         $this->assertEquals($file, $context->getResource());
     }
@@ -116,12 +119,14 @@ class ContextTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid stream provided; got type 'string'.");
+        /* @phpstan-ignore argument.type */
         $context = new Context("hello");
     }
 
     public function testCreateClosedResourceError(): void
     {
-        $file = fopen(__DIR__ . '/fixtures/stream-readonly.txt', 'r');
+        /** @var resource $file */
+        $file = fopen(__DIR__ . '/../fixtures/stream-readonly.txt', 'r');
         fclose($file);
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid stream provided; got type 'resource (closed)'.");
@@ -130,6 +135,7 @@ class ContextTest extends TestCase
 
     public function testCreateInvalidResourceError(): void
     {
+        /** @var resource $curl */
         $curl = proc_open('php', [], $pipes);
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid stream provided; got resource type 'process'.");
@@ -138,7 +144,8 @@ class ContextTest extends TestCase
 
     public function testSetOptionError(): void
     {
-        $file = fopen(__DIR__ . '/fixtures/stream-readonly.txt', 'r');
+        /** @var resource $file */
+        $file = fopen(__DIR__ . '/../fixtures/stream-readonly.txt', 'r');
         $context = new Context($file);
         fclose($file);
         $this->expectException(StreamException::class);
@@ -149,7 +156,8 @@ class ContextTest extends TestCase
 
     public function testSetOptionParamError(): void
     {
-        $file = fopen(__DIR__ . '/fixtures/stream-readonly.txt', 'r');
+        /** @var resource $file */
+        $file = fopen(__DIR__ . '/../fixtures/stream-readonly.txt', 'r');
         $context = new Context($file);
         fclose($file);
         $this->expectException(StreamException::class);

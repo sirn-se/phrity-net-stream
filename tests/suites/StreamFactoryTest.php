@@ -31,14 +31,16 @@ class StreamFactoryTest extends TestCase
 {
     public function setUp(): void
     {
-        chmod(__DIR__ . '/fixtures/stream-readonly.txt', 0400);
-        chmod(__DIR__ . '/fixtures/stream-writeonly.txt', 0200);
+        chmod(__DIR__ . '/../fixtures/stream-readonly.txt', 0400);
+        chmod(__DIR__ . '/../fixtures/stream-writeonly.txt', 0200);
+        @unlink(__DIR__ . '/../fixtures/created.txt');
     }
 
     public function tearDown(): void
     {
-        chmod(__DIR__ . '/fixtures/stream-readonly.txt', 0644);
-        chmod(__DIR__ . '/fixtures/stream-writeonly.txt', 0644);
+        chmod(__DIR__ . '/../fixtures/stream-readonly.txt', 0644);
+        chmod(__DIR__ . '/../fixtures/stream-writeonly.txt', 0644);
+        @unlink(__DIR__ . '/../fixtures/created.txt');
     }
 
     public function testFactory(): void
@@ -59,8 +61,17 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromFile(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream.txt';
+        $file = __DIR__ . '/../fixtures/stream.txt';
         $stream = $factory->createStreamFromFile($file, 'r+');
+        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
+    }
+
+    public function testCreateStreamFromCreatedFile(): void
+    {
+        $factory = new StreamFactory();
+        $file = __DIR__ . '/../fixtures/created.txt';
+        $stream = $factory->createStreamFromFile($file, 'c');
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertInstanceOf(Stream::class, $stream);
     }
@@ -68,16 +79,16 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromFileNoFileError(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/do-not-exist.txt';
+        $file = __DIR__ . '/../fixtures/do-not-exist.txt';
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("File '{$file}' do not exist.");
+        $this->expectExceptionMessage("Could not open '{$file}'.");
         $stream = $factory->createStreamFromFile($file, 'r+');
     }
 
     public function testCreateStreamFromFileInvalidModeError(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream.txt';
+        $file = __DIR__ . '/../fixtures/stream.txt';
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid mode \'invalid\'.');
         $stream = $factory->createStreamFromFile($file, 'invalid');
@@ -86,7 +97,7 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromFileReadOnly(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-readonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-readonly.txt';
         $stream = $factory->createStreamFromFile($file, 'r');
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertInstanceOf(Stream::class, $stream);
@@ -95,7 +106,7 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromFileReadOnlyError(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-readonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-readonly.txt';
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Could not open '{$file}'.");
         $stream = $factory->createStreamFromFile($file, 'w');
@@ -104,7 +115,7 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromFileWriteOnly(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-writeonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-writeonly.txt';
         $stream = $factory->createStreamFromFile($file, 'w');
         $this->assertInstanceOf(StreamInterface::class, $stream);
     }
@@ -112,7 +123,7 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromFileWriteOnlyError(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-writeonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-writeonly.txt';
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Could not open '{$file}'.");
         $stream = $factory->createStreamFromFile($file, 'r');
@@ -121,7 +132,8 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromResource(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = $factory->createStreamFromResource($resource);
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertInstanceOf(Stream::class, $stream);
@@ -134,13 +146,15 @@ class StreamFactoryTest extends TestCase
         // This provoke stream implementation to throw exception
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid stream provided; got type 'string'.");
+        /* @phpstan-ignore argument.type */
         $stream = $factory->createStreamFromResource($resource);
     }
 
     public function testCreateSocketStreamFromResource(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = $factory->createSocketStreamFromResource($resource);
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertInstanceOf(SocketStream::class, $stream);

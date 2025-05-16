@@ -16,6 +16,7 @@ use RuntimeException;
  */
 class StreamFactory implements StreamFactoryInterface
 {
+    /** @var array<string> */
     private static array $modes = ['r', 'r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+', 'e'];
 
     private ErrorHandler $handler;
@@ -38,7 +39,7 @@ class StreamFactory implements StreamFactoryInterface
      */
     public function createStream(string $content = ''): Stream
     {
-        $resource = fopen('php://temp', 'r+');
+        $resource = $this->createResource('php://temp', 'r+');
         fwrite($resource, $content);
         return $this->createStreamFromResource($resource);
     }
@@ -53,16 +54,11 @@ class StreamFactory implements StreamFactoryInterface
      */
     public function createStreamFromFile(string $filename, string $mode = 'r'): Stream
     {
-        if (!file_exists($filename)) {
-            throw new RuntimeException("File '{$filename}' do not exist.");
-        }
         if (!in_array($mode, self::$modes)) {
             throw new InvalidArgumentException("Invalid mode '{$mode}'.");
         }
-        return $this->handler->with(function () use ($filename, $mode) {
-            $resource = fopen($filename, $mode);
-            return $this->createStreamFromResource($resource);
-        }, new RuntimeException("Could not open '{$filename}'."));
+        $resource = $this->createResource($filename, $mode);
+        return $this->createStreamFromResource($resource);
     }
 
     /**
@@ -117,5 +113,21 @@ class StreamFactory implements StreamFactoryInterface
     public function createStreamCollection(): StreamCollection
     {
         return new StreamCollection();
+    }
+
+
+    // ---------- Helpers ---------------------------------------------------------------------------------------------
+
+    /**
+     * @return resource
+     * @throws RuntimeException If fails to open resource
+     */
+    private function createResource(string $filename, string $mode)
+    {
+        return $this->handler->with(function () use ($filename, $mode) {
+            /** @var resource $resource */
+            $resource = fopen($filename, $mode);
+            return $resource;
+        }, new RuntimeException("Could not open '{$filename}'."));
     }
 }

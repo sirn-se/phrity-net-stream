@@ -25,14 +25,14 @@ class StreamTest extends TestCase
 {
     public function setUp(): void
     {
-        chmod(__DIR__ . '/fixtures/stream-readonly.txt', 0400);
-        chmod(__DIR__ . '/fixtures/stream-writeonly.txt', 0200);
+        chmod(__DIR__ . '/../fixtures/stream-readonly.txt', 0400);
+        chmod(__DIR__ . '/../fixtures/stream-writeonly.txt', 0200);
     }
 
     public function tearDown(): void
     {
-        chmod(__DIR__ . '/fixtures/stream-readonly.txt', 0644);
-        chmod(__DIR__ . '/fixtures/stream-writeonly.txt', 0644);
+        chmod(__DIR__ . '/../fixtures/stream-readonly.txt', 0644);
+        chmod(__DIR__ . '/../fixtures/stream-writeonly.txt', 0644);
     }
 
     public function testTempStream(): void
@@ -130,6 +130,18 @@ class StreamTest extends TestCase
         $stream->close();
     }
 
+    public function testReadLengthError(): void
+    {
+        $factory = new StreamFactory();
+        $stream = $factory->createStream('This is a temporary test stream');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Must read minimum 1 byte');
+        /** @phpstan-ignore argument.type */
+        $stream->read(0);
+        $stream->close();
+    }
+
     public function testTellOnClosed(): void
     {
         $factory = new StreamFactory();
@@ -211,7 +223,7 @@ class StreamTest extends TestCase
     public function testReadOnly(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-readonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-readonly.txt';
         $stream = $factory->createStreamFromFile($file, 'r');
 
         // Check initial state
@@ -243,7 +255,7 @@ class StreamTest extends TestCase
     public function testReadOnlyWriteError(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-readonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-readonly.txt';
         $stream = $factory->createStreamFromFile($file, 'r');
 
         $this->expectException(StreamException::class);
@@ -256,7 +268,7 @@ class StreamTest extends TestCase
     public function testWriteOnly(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-writeonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-writeonly.txt';
         $stream = $factory->createStreamFromFile($file, 'w');
 
         // Check initial state
@@ -288,7 +300,7 @@ class StreamTest extends TestCase
     public function testWriteOnlyReadError(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-writeonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-writeonly.txt';
         $stream = $factory->createStreamFromFile($file, 'w');
 
         $this->expectException(StreamException::class);
@@ -301,7 +313,7 @@ class StreamTest extends TestCase
     public function testWriteOnlyGetContentsError(): void
     {
         $factory = new StreamFactory();
-        $file = __DIR__ . '/fixtures/stream-writeonly.txt';
+        $file = __DIR__ . '/../fixtures/stream-writeonly.txt';
         $stream = $factory->createStreamFromFile($file, 'w');
 
         $this->expectException(StreamException::class);
@@ -314,6 +326,7 @@ class StreamTest extends TestCase
     public function testDirectoryStream(): void
     {
         $dir = opendir(__DIR__);
+        /** @var resource $dir */
         $stream = new Stream($dir);
         $this->assertEquals([
             'wrapper_type' => 'plainfile',
@@ -337,6 +350,9 @@ class StreamTest extends TestCase
     public function testRemoteStream(): void
     {
         $remote = fopen('https://phrity.sirn.se/', 'r');
+        if (!$remote) {
+            $this->markTestSkipped('Could not reach online research.');
+        }
         $stream = new Stream($remote);
         $this->assertEquals('http', $stream->getMetadata('wrapper_type'));
         $this->assertEquals('tcp_socket/ssl', $stream->getMetadata('stream_type'));
@@ -362,6 +378,9 @@ class StreamTest extends TestCase
     public function testContext(): void
     {
         $remote = fopen('https://phrity.sirn.se/', 'r');
+        if (!$remote) {
+            $this->markTestSkipped('Could not reach online research.');
+        }
         $stream = new Stream($remote);
         $context = $stream->getContext();
         $this->assertInstanceOf(Context::class, $context);
@@ -372,6 +391,9 @@ class StreamTest extends TestCase
     public function testSeekOnRemoteError(): void
     {
         $remote = fopen('https://phrity.sirn.se/', 'r');
+        if (!$remote) {
+            $this->markTestSkipped('Could not reach online research.');
+        }
         $stream = new Stream($remote);
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::NOT_SEEKABLE);
@@ -384,6 +406,7 @@ class StreamTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid stream provided; got type 'string'.");
+        /* @phpstan-ignore argument.type */
         $stream = new Stream("should fail");
     }
 
