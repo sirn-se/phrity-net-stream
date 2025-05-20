@@ -93,6 +93,7 @@ class Context
      */
     public function setParams(array $params): self
     {
+        /** @phpstan-ignore booleanNot.alwaysFalse */
         if (!is_resource($this->stream) || !stream_context_set_params($this->stream, $params)) {
             throw new StreamException(StreamException::CONTEXT_SET_ERR);
         }
