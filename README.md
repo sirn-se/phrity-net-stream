@@ -218,6 +218,19 @@ class Context {
     public function setParam(string $param, mixed $value): self;
     public function setParams(array $params): self;
     public function getResource(): mixed;
+
+    // Listeners
+
+    public function onResolve(Closure $closure): void;
+    public function onConnect(Closure $closure): void;
+    public function onAuthRequired(Closure $closure): void;
+    public function onMimeType(Closure $closure): void;
+    public function onFileSize(Closure $closure): void;
+    public function onRedirected(Closure $closure): void;
+    public function onProgress(Closure $closure): void;
+    public function onCompleted(Closure $closure): void;
+    public function onFailure(Closure $closure): void;
+    public function onAuthResult(Closure $closure): void;
 }
 ```
 
@@ -225,7 +238,7 @@ class Context {
 
 | Version | PHP | |
 | --- | --- | --- |
-| `2.3` | `^8.1` | Float timeout, hasContent method |
+| `2.3` | `^8.1` | Float timeout, hasContent method, Listeners |
 | `2.2` | `^8.1` | Improved context handling |
 | `2.1` | `^8.0` | Set context on server |
 | `2.0` | `^8.0` | Modernization |

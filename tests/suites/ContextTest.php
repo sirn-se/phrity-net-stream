@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use Closure;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     Context,
+    SocketClient,
     StreamException,
+    StreamFactory,
+    Uri,
 };
 
 class ContextTest extends TestCase
@@ -67,7 +71,7 @@ class ContextTest extends TestCase
         $params = $context->getParams();
         /* @phpstan-ignore method.alreadyNarrowedType */
         $this->assertIsArray($params);
-        $this->assertEquals(['options' => []], $params);
+        $this->assertEquals([], $params['options']);
         $context->setParams([
             'options' => [
                 'test-wrapper-1' => [
@@ -105,6 +109,69 @@ class ContextTest extends TestCase
             ],
         ], $params);
         $this->assertEquals('test-notification-c', $context->getParam('notification'));
+    }
+
+    public function testNotifiers(): void
+    {
+        $results = [];
+
+        $context = new Context();
+        $context->onResolve(function () use (&$results) {
+            $results[] = 'onResolve';
+        });
+        $context->onConnect(function () use (&$results) {
+            $results[] = 'onConnect';
+        });
+        $context->onAuthRequired(function () use (&$results) {
+            $results[] = 'onAuthRequired';
+        });
+        $context->onMimeType(function (string $mimeType) use (&$results) {
+            $results[] = 'onMimeType';
+        });
+        $context->onFileSize(function (int $fileSize) use (&$results) {
+            $results[] = 'onFileSize';
+        });
+        $context->onRedirected(function (string $uri) use (&$results) {
+            $results[] = 'onRedirected';
+        });
+        $context->onProgress(function (int $transferred, int $max) use (&$results) {
+            $results[] = 'onProgress';
+        });
+        $context->onCompleted(function () use (&$results) {
+            $results[] = 'onCompleted';
+        });
+        $context->onFailure(function (string $message, int $code) use (&$results) {
+            $results[] = 'onFailure';
+        });
+        $context->onAuthResult(function () use (&$results) {
+            $results[] = 'onAuthResult';
+        });
+
+        $this->assertInstanceOf(Closure::class, $context->getParam('notification'));
+
+        $callback = $context->getParam('notification');
+        $callback(STREAM_NOTIFY_RESOLVE, STREAM_NOTIFY_SEVERITY_INFO, null, 0, 0, 0);
+        $callback(STREAM_NOTIFY_CONNECT, STREAM_NOTIFY_SEVERITY_INFO, null, 0, 0, 0);
+        $callback(STREAM_NOTIFY_AUTH_REQUIRED, STREAM_NOTIFY_SEVERITY_ERR, null, 0, 0, 0);
+        $callback(STREAM_NOTIFY_MIME_TYPE_IS, STREAM_NOTIFY_SEVERITY_INFO, 'text/html', 0, 0, 0);
+        $callback(STREAM_NOTIFY_FILE_SIZE_IS, STREAM_NOTIFY_SEVERITY_INFO, 1024, 0, 0, 0);
+        $callback(STREAM_NOTIFY_REDIRECTED, STREAM_NOTIFY_SEVERITY_INFO, 'somewhere', 0, 0, 0);
+        $callback(STREAM_NOTIFY_PROGRESS, STREAM_NOTIFY_SEVERITY_INFO, null, 0, 256, 1024);
+        $callback(STREAM_NOTIFY_COMPLETED, STREAM_NOTIFY_SEVERITY_INFO, null, 0, 0, 0);
+        $callback(STREAM_NOTIFY_FAILURE, STREAM_NOTIFY_SEVERITY_INFO, 'error', 12, 0, 0);
+        $callback(STREAM_NOTIFY_AUTH_RESULT, STREAM_NOTIFY_SEVERITY_INFO, null, 0, 0, 0);
+        $this->assertEquals([
+            'onResolve',
+            'onConnect',
+            'onAuthRequired',
+            'onMimeType',
+            'onFileSize',
+            'onRedirected',
+            'onProgress',
+            'onCompleted',
+            'onFailure',
+            'onAuthResult',
+        ], $results);
     }
 
     public function testCreateWithStream(): void
