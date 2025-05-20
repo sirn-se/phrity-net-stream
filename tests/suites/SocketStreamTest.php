@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     Context,
@@ -22,7 +23,8 @@ class SocketStreamTest extends TestCase
     public function testTempStream(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = $factory->createSocketStreamFromResource($resource);
 
         $this->assertTrue($stream->isConnected());
@@ -34,13 +36,27 @@ class SocketStreamTest extends TestCase
         $this->assertTrue($stream->setBlocking(false));
         $this->assertFalse($stream->isBlocking());
 
-        $this->assertFalse($stream->setTimeout(1, 2));
+        $this->assertFalse($stream->setTimeout(1.2));
+        $this->assertTrue($stream->hasContent());
+    }
+
+    public function testInvalidTimeout(): void
+    {
+        $factory = new StreamFactory();
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
+        $stream = $factory->createSocketStreamFromResource($resource);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Timeout must be 0 or more.');
+        $stream->setTimeout(-1);
     }
 
     public function testSetBlockingOnClosed(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = $factory->createSocketStreamFromResource($resource);
         $stream->close();
         $this->assertNull($stream->isBlocking());
@@ -53,20 +69,22 @@ class SocketStreamTest extends TestCase
     public function testSetTimeoutOnClosed(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = $factory->createSocketStreamFromResource($resource);
         $stream->close();
         $this->assertNull($stream->isBlocking());
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::STREAM_DETACHED);
         $this->expectExceptionMessage('Stream is detached.');
-        $stream->setTimeout(1, 2);
+        $stream->setTimeout(1);
     }
 
     public function testReadLine(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream-readonly.txt', 'r');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream-readonly.txt', 'r');
         $stream = $factory->createSocketStreamFromResource($resource);
         $this->assertEquals('Test case for streams.', $stream->readLine(1024));
     }
@@ -74,7 +92,8 @@ class SocketStreamTest extends TestCase
     public function testReadLineOnClosed(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream-readonly.txt', 'r');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream-readonly.txt', 'r');
         $stream = $factory->createSocketStreamFromResource($resource);
         $stream->close();
         $this->expectException(StreamException::class);
@@ -86,7 +105,8 @@ class SocketStreamTest extends TestCase
     public function testWriteOnlyReadLineError(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream-writeonly.txt', 'w');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream-writeonly.txt', 'w');
         $stream = $factory->createSocketStreamFromResource($resource);
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::NOT_READABLE);
@@ -97,41 +117,50 @@ class SocketStreamTest extends TestCase
     public function testReadClose(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = $factory->createSocketStreamFromResource($resource);
         $this->assertTrue($stream->isReadable());
         $this->assertTrue($stream->isWritable());
+        $this->assertTrue($stream->hasContent());
         $stream->closeRead();
         $this->assertFalse($stream->isReadable());
         $this->assertTrue($stream->isWritable());
         $this->assertTrue($stream->isConnected());
+        $this->assertTrue($stream->hasContent());
         $stream->closeWrite();
         $this->assertFalse($stream->isReadable());
         $this->assertFalse($stream->isWritable());
         $this->assertFalse($stream->isConnected());
+        $this->assertFalse($stream->hasContent());
     }
 
     public function testWriteClose(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = $factory->createSocketStreamFromResource($resource);
         $this->assertTrue($stream->isReadable());
         $this->assertTrue($stream->isWritable());
+        $this->assertTrue($stream->hasContent());
         $stream->closeWrite();
         $this->assertTrue($stream->isReadable());
         $this->assertFalse($stream->isWritable());
         $this->assertTrue($stream->isConnected());
+        $this->assertTrue($stream->hasContent());
         $stream->closeRead();
         $this->assertFalse($stream->isReadable());
         $this->assertFalse($stream->isWritable());
         $this->assertFalse($stream->isConnected());
+        $this->assertFalse($stream->hasContent());
     }
 
     public function testContext(): void
     {
         $factory = new StreamFactory();
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = $factory->createSocketStreamFromResource($resource);
         $context = $stream->getContext();
         $this->assertInstanceOf(Context::class, $context);

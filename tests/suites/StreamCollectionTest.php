@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     SocketServer,
@@ -23,9 +24,10 @@ class StreamCollectionTest extends TestCase
 {
     public function testCollection(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8020');
         $server = new SocketServer($uri);
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = new SocketStream($resource);
 
         $collection = new StreamCollection();
@@ -64,13 +66,24 @@ class StreamCollectionTest extends TestCase
         $this->assertFalse($collection->detach($server));
         $this->assertEmpty($collection);
 
+        /* @phpstan-ignore method.alreadyNarrowedType */
         $this->assertIsString($collection->attach($stream));
         $this->assertCount(1, $collection);
     }
 
+    public function testInvalidTimeout(): void
+    {
+        $collection = new StreamCollection();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Timeout must be 0 or more.');
+        $collection->waitRead(-1);
+    }
+
     public function testAttachError(): void
     {
-        $resource = fopen(__DIR__ . '/fixtures/stream.txt', 'r+');
+        /** @var resource $resource */
+        $resource = fopen(__DIR__ . '/../fixtures/stream.txt', 'r+');
         $stream = new SocketStream($resource);
         $collection = new StreamCollection();
         $collection->attach($stream, 'my-key');
@@ -84,6 +97,7 @@ class StreamCollectionTest extends TestCase
     {
         $collection = new StreamCollection();
         $this->expectException(TypeError::class);
+        /* @phpstan-ignore argument.type */
         $collection->detach(1);
     }
 

@@ -21,6 +21,7 @@ class StreamException extends RuntimeException
     public const FAIL_TELL = 1023;
     public const FAIL_CONTENTS = 1024;
     public const FAIL_GETS = 1025;
+    public const FAIL_SELECT = 1026;
 
     // Client errors
     public const CLIENT_CONNECT_ERR = 2000;
@@ -39,6 +40,7 @@ class StreamException extends RuntimeException
     // Context errors
     public const CONTEXT_SET_ERR = 5000;
 
+    /** @var array<int, string> */
     private static array $messages = [
         self::STREAM_DETACHED => 'Stream is detached.',
         self::NOT_READABLE => 'Stream is not readable.',
@@ -50,6 +52,7 @@ class StreamException extends RuntimeException
         self::FAIL_TELL => 'Failed tell() on stream.',
         self::FAIL_CONTENTS => 'Failed getContents() on stream.',
         self::FAIL_GETS => 'Failed gets() on stream.',
+        self::FAIL_SELECT => 'Failed select() on stream.',
         self::CLIENT_CONNECT_ERR => 'Client could not connect to "{uri}".',
         self::SCHEME_TRANSPORT => 'Scheme "{scheme}" is not supported.',
         self::SCHEME_HANDLER => 'Could not handle scheme "{scheme}".',
@@ -64,7 +67,7 @@ class StreamException extends RuntimeException
     /**
      * Create exception.
      * @param int $code Error code
-     * @param array $data Additional data
+     * @param array<string, mixed> $data Additional data
      * @param Throwable|null $previous Previous exception
      */
     public function __construct(int $code, array $data = [], Throwable|null $previous = null)

@@ -4,15 +4,18 @@ namespace Phrity\Net;
 
 use Countable;
 use ErrorException;
+use InvalidArgumentException;
 use Iterator;
 use Phrity\Util\ErrorHandler;
 
 /**
  * StreamCollection class.
+ * @implements Iterator<string, Stream>
  */
 class StreamCollection implements Countable, Iterator
 {
     protected ErrorHandler $handler;
+    /** @var array<string, Stream> */
     private array $streams = [];
 
     /**
@@ -99,12 +102,18 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Wait for redable content in stream collection.
-     * @param int $seconds Timeout in seconds.
+     * @param int<0, max>|float $timeout Timeout in seconds.
      * @return self New collection instance.
      * @throws StreamException If fails to select.
      */
-    public function waitRead(int $seconds = 60): self
+    public function waitRead(int|float $timeout = 60): self
     {
+        if ($timeout < 0) {
+            throw new InvalidArgumentException("Timeout must be 0 or more.");
+        }
+        $seconds = intval($timeout);
+        $microseconds = intval(round($timeout - $seconds, 6) * 1000000);
+
         $read = [];
         foreach ($this->streams as $key => $stream) {
             if ($stream->isReadable()) {
@@ -115,9 +124,10 @@ class StreamCollection implements Countable, Iterator
             return new self(); // Nothing to select
         }
 
-        $changed = $this->handler->with(function () use ($read, $seconds) {
+        $changed = $this->handler->with(function () use ($read, $seconds, $microseconds) {
             $write = $oob = [];
-            stream_select($read, $write, $oob, $seconds);
+            /** @phpstan-ignore argument.type */
+            stream_select($read, $write, $oob, $seconds, $microseconds);
             return $read;
         }, function (ErrorException $error) {
             return []; // Ignore, but don't use result
@@ -147,18 +157,18 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Return the current stream.
-     * @return Stream Current stream.
+     * @return Stream|null Current stream.
      */
-    public function current(): Stream
+    public function current(): Stream|null
     {
-        return current($this->streams);
+        return current($this->streams) ?: null;
     }
 
     /**
      * Return the key of the current stream.
      * @return string Current key.
      */
-    public function key(): string
+    public function key(): string|null
     {
         return key($this->streams);
     }
@@ -185,7 +195,7 @@ class StreamCollection implements Countable, Iterator
      */
     public function valid(): bool
     {
-        return array_key_exists(key($this->streams), $this->streams);
+        return array_key_exists(key($this->streams) ?? -1, $this->streams);
     }
 
 

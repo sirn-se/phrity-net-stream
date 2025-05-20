@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     Context,
@@ -72,14 +73,14 @@ class SocketServerTest extends TestCase
             'seekable' => false,
             'uri' => 'unix:///tmp/test.sock',
         ], $server->getMetadata());
-        $stream = $server->accept(0);
+        $stream = $server->accept(0.01);
         $this->assertNull($stream); // Non-blocking, nothing to accept
         $server->close();
     }
 
     public function testUnsupportedScheme(): void
     {
-        $uri = new Uri('http://0.0.0.0:8000');
+        $uri = new Uri('http://0.0.0.0:8001');
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::SCHEME_TRANSPORT);
         $this->expectExceptionMessage('Scheme "http" is not supported.');
@@ -88,7 +89,7 @@ class SocketServerTest extends TestCase
 
     public function testUnknownScheme(): void
     {
-        $uri = new Uri('fake://0.0.0.0:8000');
+        $uri = new Uri('fake://0.0.0.0:8002');
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::SCHEME_HANDLER);
         $this->expectExceptionMessage('Could not handle scheme "fake".');
@@ -104,9 +105,18 @@ class SocketServerTest extends TestCase
         $server = new SocketServer($uri);
     }
 
-    public function testBlockingServerTimeout(): void
+    public function testInvalidTimeout(): void
     {
         $uri = new Uri('tcp://0.0.0.0:8000');
+        $server = new SocketServer($uri);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Timeout must be 0 or more.');
+        $server->accept(-1);
+    }
+
+    public function testBlockingServerTimeout(): void
+    {
+        $uri = new Uri('tcp://0.0.0.0:8003');
         $server = new SocketServer($uri);
         $this->assertEquals([
             'timed_out' => false,
@@ -116,7 +126,7 @@ class SocketServerTest extends TestCase
             'mode' => 'r+',
             'unread_bytes' => 0,
             'seekable' => false,
-            'uri' => 'tcp://0.0.0.0:8000',
+            'uri' => 'tcp://0.0.0.0:8003',
         ], $server->getMetadata());
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::SERVER_ACCEPT_ERR);
@@ -127,7 +137,7 @@ class SocketServerTest extends TestCase
 
     public function testAcceptOnClosedError(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8004');
         $server = new SocketServer($uri);
         $server->close();
         $this->expectException(StreamException::class);
@@ -138,7 +148,7 @@ class SocketServerTest extends TestCase
 
     public function testSetBlockingOnClosedError(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8005');
         $server = new SocketServer($uri);
         $server->close();
         $this->expectException(StreamException::class);
@@ -149,7 +159,7 @@ class SocketServerTest extends TestCase
 
     public function testContext(): void
     {
-        $uri = new Uri('tcp://0.0.0.0:8000');
+        $uri = new Uri('tcp://0.0.0.0:8006');
         $context = new Context();
         $context->setOption('a', 'b', 'c');
         $server = new SocketServer($uri, $context);

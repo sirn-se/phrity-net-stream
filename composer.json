@@ -19,7 +19,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Phrity\\Net\\Test\\": "tests/"
+            "Phrity\\Net\\Test\\": "tests/mock/"
         }
     },
     "require": {
@@ -31,7 +31,7 @@
     "require-dev": {
         "php-coveralls/php-coveralls": "^2.0",
         "phpstan/phpstan": "^2.0",
-        "phpunit/phpunit": "^10.0 | ^11.0",
+        "phpunit/phpunit": "^10.0 | ^11.0  | ^12.0",
         "phrity/net-uri": "^2.0",
         "squizlabs/php_codesniffer": "^3.5"
     }

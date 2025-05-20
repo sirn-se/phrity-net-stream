@@ -2,6 +2,7 @@
 
 namespace Phrity\Net;
 
+use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\UriInterface;
 
@@ -13,7 +14,8 @@ class SocketClient
     protected UriInterface $uri;
     protected ErrorHandler $handler;
     protected bool $persistent = false;
-    protected int|null $timeout = null;
+    /** @var int<0, max>|float|null */
+    protected int|float|null $timeout = null;
     protected Context $context;
 
     /**
@@ -32,8 +34,8 @@ class SocketClient
 
     /**
      * Set stream context.
-     * @param Context|array|null $options
-     * @param array|null $params
+     * @param Context|array<string, array<string, mixed>>|null $options
+     * @param array<string, mixed>|null $params
      * @return SocketClient
      */
     public function setContext(Context|array|null $options = null, array|null $params = null): self
@@ -67,11 +69,14 @@ class SocketClient
 
     /**
      * Set timeout in seconds.
-     * @param int|null $timeout
+     * @param int<0, max>|float|null $timeout
      * @return SocketClient
      */
-    public function setTimeout(int|null $timeout): self
+    public function setTimeout(int|float|null $timeout): self
     {
+        if (!is_null($timeout) && $timeout < 0) {
+            throw new InvalidArgumentException("Timeout must be 0 or more.");
+        }
         $this->timeout = $timeout;
         return $this;
     }

@@ -3,6 +3,7 @@
 namespace Phrity\Net;
 
 use ErrorException;
+use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
 use Psr\Http\Message\UriInterface;
 
@@ -11,11 +12,14 @@ use Psr\Http\Message\UriInterface;
  */
 class SocketServer extends Stream
 {
+    /** @var array<string> */
     private static array $internet_schemes = ['tcp', 'udp', 'tls', 'ssl'];
+    /** @var array<string> */
     private static array $unix_schemes = ['unix', 'udg'];
 
     protected ErrorHandler $handler;
     protected string $address;
+    /** @var resource */
     protected $stream;
     protected Context $context;
 
@@ -56,8 +60,8 @@ class SocketServer extends Stream
 
     /**
      * Set stream context.
-     * @param Context|array|null $options
-     * @param array|null $params
+     * @param Context|array<string, array<string, mixed>>|null $options
+     * @param array<string, mixed>|null $params
      * @return static
      */
     public function setContext(Context|array|null $options = null, array|null $params = null): self
@@ -80,7 +84,7 @@ class SocketServer extends Stream
 
     /**
      * Retrieve list of registered socket transports.
-     * @return array List of registered transports.
+     * @return array<string> List of registered transports.
      */
     public function getTransports(): array
     {
@@ -104,7 +108,7 @@ class SocketServer extends Stream
      */
     public function setBlocking(bool $enable): bool
     {
-        if (!isset($this->stream)) {
+        if (!is_resource($this->stream)) {
             throw new StreamException(StreamException::SERVER_CLOSED);
         }
         return stream_set_blocking($this->stream, $enable);
@@ -119,7 +123,7 @@ class SocketServer extends Stream
      */
     public function getMetadata(string|null $key = null): mixed
     {
-        if (!isset($this->stream)) {
+        if (!is_resource($this->stream)) {
             return null;
         }
         // Add URI default for version compability
@@ -137,13 +141,16 @@ class SocketServer extends Stream
 
     /**
      * Accept a connection on a socket.
-     * @param int|null $timeout Override the default socket accept timeout.
+     * @param int<0, max>|float|null $timeout Override the default socket accept timeout.
      * @return SocketStream|null The stream for opened conenction.
      * @throws StreamException if socket is closed
      */
-    public function accept(int|null $timeout = null): SocketStream|null
+    public function accept(int|float|null $timeout = null): SocketStream|null
     {
-        if (!isset($this->stream)) {
+        if (!is_null($timeout) && $timeout < 0) {
+            throw new InvalidArgumentException("Timeout must be 0 or more.");
+        }
+        if (!is_resource($this->stream)) {
             throw new StreamException(StreamException::SERVER_CLOSED);
         }
         $stream = $this->handler->with(function () use ($timeout) {
