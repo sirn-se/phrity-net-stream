@@ -16,7 +16,7 @@ class Context
     private $stream;
 
     /** @var array<int<1, 10>, Closure> */
-    private array $notifiers = [];
+    protected array $notifiers = [];
 
     /**
      * Create exception.
@@ -76,6 +76,9 @@ class Context
         return $this;
     }
 
+    /**
+     * @deprecated Use getOption.
+     */
     public function getParam(string $param): mixed
     {
         return stream_context_get_params($this->stream)[$param] ?? null;
@@ -83,12 +86,16 @@ class Context
 
     /**
      * @return array<string, mixed>
+     * @deprecated Use getOptions.
      */
     public function getParams(): array
     {
         return stream_context_get_params($this->stream);
     }
 
+    /**
+     * @deprecated Use setOption and on- callbacks instead.
+     */
     public function setParam(string $param, mixed $value): self
     {
         $this->setParams([$param => $value]);
@@ -97,7 +104,7 @@ class Context
 
     /**
      * @param array<string, mixed> $params
-     * @deprecated Use setOption(s) and on- callbacks instead.
+     * @deprecated Use setOptions and on- callbacks instead.
      */
     public function setParams(array $params): self
     {
@@ -173,7 +180,7 @@ class Context
         $this->notifiers[STREAM_NOTIFY_AUTH_RESULT] = $closure;
     }
 
-    private function notifyCallback(
+    protected function notifyCallback(
         int $code,
         int $severity,
         string|null $message,

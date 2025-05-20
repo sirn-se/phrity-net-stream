@@ -75,7 +75,7 @@ class SocketStream extends Stream
      * @return bool If there is content to read.
      * @throws StreamException if stream is unselectable.
      */
-    public function hasContent(): bool
+    public function hasContents(): bool
     {
         if (!is_resource($this->stream)) {
             return false;
