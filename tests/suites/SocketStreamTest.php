@@ -37,6 +37,7 @@ class SocketStreamTest extends TestCase
         $this->assertFalse($stream->isBlocking());
 
         $this->assertFalse($stream->setTimeout(1.2));
+        $this->assertTrue($stream->hasContent());
     }
 
     public function testInvalidTimeout(): void
@@ -121,14 +122,17 @@ class SocketStreamTest extends TestCase
         $stream = $factory->createSocketStreamFromResource($resource);
         $this->assertTrue($stream->isReadable());
         $this->assertTrue($stream->isWritable());
+        $this->assertTrue($stream->hasContent());
         $stream->closeRead();
         $this->assertFalse($stream->isReadable());
         $this->assertTrue($stream->isWritable());
         $this->assertTrue($stream->isConnected());
+        $this->assertTrue($stream->hasContent());
         $stream->closeWrite();
         $this->assertFalse($stream->isReadable());
         $this->assertFalse($stream->isWritable());
         $this->assertFalse($stream->isConnected());
+        $this->assertFalse($stream->hasContent());
     }
 
     public function testWriteClose(): void
@@ -139,14 +143,17 @@ class SocketStreamTest extends TestCase
         $stream = $factory->createSocketStreamFromResource($resource);
         $this->assertTrue($stream->isReadable());
         $this->assertTrue($stream->isWritable());
+        $this->assertTrue($stream->hasContent());
         $stream->closeWrite();
         $this->assertTrue($stream->isReadable());
         $this->assertFalse($stream->isWritable());
         $this->assertTrue($stream->isConnected());
+        $this->assertTrue($stream->hasContent());
         $stream->closeRead();
         $this->assertFalse($stream->isReadable());
         $this->assertFalse($stream->isWritable());
         $this->assertFalse($stream->isConnected());
+        $this->assertFalse($stream->hasContent());
     }
 
     public function testContext(): void

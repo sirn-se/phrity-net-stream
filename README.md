@@ -69,6 +69,7 @@ class SocketStream extends Stream
     public function getResourceType(): string; // Get resource type
     public function isBlocking(): bool|null; // If stream is blocking or not
     public function setBlocking(bool $enable): bool; // Change blocking mode
+    public function hasContent(): bool; // If stream has readable content
     public function setTimeout(int|float $timeout): bool; // Set timeout
     public function readLine(int $length): string|null; // Read a line from stream, up to $length bytes
     public function closeRead(): void; // Closes the stream for further reading
@@ -224,7 +225,7 @@ class Context {
 
 | Version | PHP | |
 | --- | --- | --- |
-| `2.3` | `^8.1` | Float timeout |
+| `2.3` | `^8.1` | Float timeout, hasContent method |
 | `2.2` | `^8.1` | Improved context handling |
 | `2.1` | `^8.0` | Set context on server |
 | `2.0` | `^8.0` | Modernization |

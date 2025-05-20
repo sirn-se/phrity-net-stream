@@ -71,6 +71,23 @@ class SocketStream extends Stream
     }
 
     /**
+     * If socket stream has unread content.
+     * @return bool If there is content to read.
+     * @throws StreamException if stream is unselectable.
+     */
+    public function hasContent(): bool
+    {
+        if (!is_resource($this->stream)) {
+            return false;
+        }
+        return $this->handler->with(function () {
+            $read = [$this->getOpenResource()];
+            $write = $oob = [];
+            return stream_select($read, $write, $oob, 0, 0) > 0;
+        }, new StreamException(StreamException::FAIL_SELECT));
+    }
+
+    /**
      * Set timeout period on a stream.
      * @param int<0, max>|float $timeout Seconds to be set.
      * @param int|null $microseconds Microseconds to be set.
