@@ -15,7 +15,7 @@ class Context
     /** @var resource */
     private $stream;
 
-    /** @var array<int, Closure> */
+    /** @var array<int<1, 10>, Closure> */
     private array $notifiers = [];
 
     /**
@@ -196,7 +196,6 @@ class Context
             STREAM_NOTIFY_REDIRECTED => ['uri' => $message],
             STREAM_NOTIFY_PROGRESS => ['transferred' => $transferred, 'max' => $max],
             STREAM_NOTIFY_FAILURE => ['message' => $message, 'code' => $errorCode],
-            default => throw new RuntimeException("No supoort for notification with code {$code}."),
         };
         $callback(...$params);
     }
