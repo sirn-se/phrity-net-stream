@@ -9,10 +9,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
     Context,
-    SocketClient,
     StreamException,
-    StreamFactory,
-    Uri,
 };
 
 class ContextTest extends TestCase

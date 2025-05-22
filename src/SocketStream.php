@@ -90,7 +90,7 @@ class SocketStream extends Stream
     /**
      * Set timeout period on a stream.
      * @param int<0, max>|float $timeout Seconds to be set.
-     * @param int|null $microseconds Microseconds to be set.
+     * @param int|null $microseconds Microseconds to be set - deprecated
      * @return bool If operation was succesful.
      * @throws StreamException if stream is closed.
      */
