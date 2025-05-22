@@ -17,14 +17,14 @@ composer require phrity/net-stream
 
 ## Included classes
 
-* [Stream](Documentation/Stream.md) - PSR-7 StreamFactory compatible Stream class
-* [SocketStream](Documentation/SocketStream.md) - Extending Stream for additional methods
-* [SocketClient](Documentation/SocketClient.md) - Socket Client that creates SocketStream connections
-* [SocketServer](Documentation/SocketServer.md) - Socket Server that creates SocketStream connections
-* [StreamCollection](Documentation/StreamCollection.md) - Collection of connections
-* [StreamFactory](Documentation/StreamFactory.md) - PSR-17 StreamFactoryInterface compatible factory
-* [StreamException](Documentation/StreamException.md) - Exception for stream related errors
-* [Context](Documentation/Context.md) - Context wrapper fro streams
+* [Stream](docs/Stream.md) - PSR-7 StreamFactory compatible Stream class
+* [SocketStream](docs/SocketStream.md) - Extending Stream for additional methods
+* [SocketClient](docs/SocketClient.md) - Socket Client that creates SocketStream connections
+* [SocketServer](docs/SocketServer.md) - Socket Server that creates SocketStream connections
+* [StreamCollection](docs/StreamCollection.md) - Collection of connections
+* [StreamFactory](docs/StreamFactory.md) - PSR-17 StreamFactoryInterface compatible factory
+* [StreamException](docs/StreamException.md) - Exception for stream related errors
+* [Context](docs/Context.md) - Context wrapper fro streams
 
 
 ## Versions
