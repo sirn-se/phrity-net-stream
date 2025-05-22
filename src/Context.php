@@ -2,6 +2,7 @@
 
 namespace Phrity\Net;
 
+use Closure;
 use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
@@ -13,6 +14,9 @@ class Context
 {
     /** @var resource */
     private $stream;
+
+    /** @var array<int<1, 10>, Closure> */
+    protected array $notifiers = [];
 
     /**
      * Create exception.
@@ -33,6 +37,9 @@ class Context
              throw new InvalidArgumentException("Invalid stream provided; got resource type '{$rtype}'.");
         }
         $this->stream = $stream;
+        stream_context_set_params($this->stream, ['notification' => function (...$input) {
+            $this->notifyCallback(...$input);
+        }]);
     }
 
     public function getOption(string $wrapper, string $option): mixed
@@ -69,6 +76,9 @@ class Context
         return $this;
     }
 
+    /**
+     * @deprecated Use getOption.
+     */
     public function getParam(string $param): mixed
     {
         return stream_context_get_params($this->stream)[$param] ?? null;
@@ -76,12 +86,16 @@ class Context
 
     /**
      * @return array<string, mixed>
+     * @deprecated Use getOptions.
      */
     public function getParams(): array
     {
         return stream_context_get_params($this->stream);
     }
 
+    /**
+     * @deprecated Use setOption and on- callbacks instead.
+     */
     public function setParam(string $param, mixed $value): self
     {
         $this->setParams([$param => $value]);
@@ -90,6 +104,7 @@ class Context
 
     /**
      * @param array<string, mixed> $params
+     * @deprecated Use setOptions and on- callbacks instead.
      */
     public function setParams(array $params): self
     {
@@ -103,5 +118,92 @@ class Context
     public function getResource(): mixed
     {
         return $this->stream;
+    }
+
+    /** @param Closure(): void $closure */
+    public function onResolve(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_RESOLVE] = $closure;
+    }
+
+    /** @param Closure(): void $closure */
+    public function onConnect(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_CONNECT] = $closure;
+    }
+
+    /** @param Closure(): void $closure */
+    public function onAuthRequired(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_AUTH_REQUIRED] = $closure;
+    }
+
+    /** @param Closure(string $mimeType): void $closure */
+    public function onMimeType(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_MIME_TYPE_IS] = $closure;
+    }
+
+    /** @param Closure(int $fileSize): void $closure */
+    public function onFileSize(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_FILE_SIZE_IS] = $closure;
+    }
+
+    /** @param Closure(string $uri): void $closure */
+    public function onRedirected(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_REDIRECTED] = $closure;
+    }
+
+    /** @param Closure(int $transferred, int $max): void $closure */
+    public function onProgress(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_PROGRESS] = $closure;
+    }
+
+    /** @param Closure(): void $closure */
+    public function onCompleted(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_COMPLETED] = $closure;
+    }
+
+    /** @param Closure(string $message, int $code): void $closure */
+    public function onFailure(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_FAILURE] = $closure;
+    }
+
+    /** @param Closure(): void $closure */
+    public function onAuthResult(Closure $closure): void
+    {
+        $this->notifiers[STREAM_NOTIFY_AUTH_RESULT] = $closure;
+    }
+
+    protected function notifyCallback(
+        int $code,
+        int $severity,
+        string|null $message,
+        int $errorCode,
+        int $transferred,
+        int $max,
+    ): void {
+        if (!array_key_exists($code, $this->notifiers)) {
+            return;
+        }
+        $callback = $this->notifiers[$code];
+        $params = match ($code) {
+            STREAM_NOTIFY_RESOLVE,
+            STREAM_NOTIFY_CONNECT,
+            STREAM_NOTIFY_AUTH_REQUIRED,
+            STREAM_NOTIFY_COMPLETED,
+            STREAM_NOTIFY_AUTH_RESULT => [],
+            STREAM_NOTIFY_MIME_TYPE_IS => ['mimeType' => $message],
+            STREAM_NOTIFY_FILE_SIZE_IS => ['fileSize' => $message],
+            STREAM_NOTIFY_REDIRECTED => ['uri' => $message],
+            STREAM_NOTIFY_PROGRESS => ['transferred' => $transferred, 'max' => $max],
+            STREAM_NOTIFY_FAILURE => ['message' => $message, 'code' => $errorCode],
+        };
+        $callback(...$params);
     }
 }
