@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/logotype.png" alt="Phrity Net Stream" width="100%"></p>
+
 [![Build Status](https://github.com/sirn-se/phrity-net-stream/actions/workflows/acceptance.yml/badge.svg)](https://github.com/sirn-se/phrity-net-stream/actions)
 [![Coverage Status](https://coveralls.io/repos/github/sirn-se/phrity-net-stream/badge.svg?branch=main)](https://coveralls.io/github/sirn-se/phrity-net-stream?branch=main)
 
