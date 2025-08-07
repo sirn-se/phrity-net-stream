@@ -26,6 +26,8 @@ class SocketServer extends Stream
     /**
      * Create new socker server instance
      * @param UriInterface $uri The URI to open socket on.
+     * @throws StreamException if invalid scheme.
+     * @throws StreamException if unsupported scheme.
      * @throws StreamException if unable to create socket.
      */
     public function __construct(UriInterface $uri, Context|null $context = null)
@@ -42,6 +44,7 @@ class SocketServer extends Stream
             throw new StreamException(StreamException::SCHEME_HANDLER, ['scheme' => $uri->getScheme()]);
         }
         $this->context = $context ?? new Context();
+        /** @throws StreamException on failure */
         $this->stream = $this->handler->with(function () {
             $error_code = $error_message = '';
             return stream_socket_server(
@@ -143,6 +146,7 @@ class SocketServer extends Stream
      * Accept a connection on a socket.
      * @param int<0, max>|float|null $timeout Override the default socket accept timeout.
      * @return SocketStream|null The stream for opened conenction.
+     * @throws InvalidArgumentException if invalid timeout
      * @throws StreamException if socket is closed
      */
     public function accept(int|float|null $timeout = null): SocketStream|null
@@ -153,6 +157,7 @@ class SocketServer extends Stream
         if (!is_resource($this->stream)) {
             throw new StreamException(StreamException::SERVER_CLOSED);
         }
+        /** @throws StreamException */
         $stream = $this->handler->with(function () use ($timeout) {
             $peer_name = '';
             return stream_socket_accept($this->stream, $timeout, $peer_name);

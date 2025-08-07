@@ -21,7 +21,8 @@ class Context
     /**
      * Create exception.
      * @param open-resource|null $stream
-     * @throws InvalidArgumentException if incorrect resource
+     * @throws InvalidArgumentException if not a resource
+     * @throws InvalidArgumentException if wrong resource type
      */
     public function __construct(mixed $stream = null)
     {
@@ -55,6 +56,9 @@ class Context
         return stream_context_get_options($this->stream);
     }
 
+    /**
+     * @throws StreamException on failure
+     */
     public function setOption(string $wrapper, string $option, mixed $value): self
     {
         if (!is_resource($this->stream) || !stream_context_set_option($this->stream, $wrapper, $option, $value)) {
@@ -105,6 +109,7 @@ class Context
     /**
      * @param array<string, mixed> $params
      * @deprecated Use setOptions and on- callbacks instead.
+     * @throws StreamException on failure
      */
     public function setParams(array $params): self
     {

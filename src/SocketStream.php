@@ -80,6 +80,7 @@ class SocketStream extends Stream
         if (!is_resource($this->stream)) {
             return false;
         }
+        /** @throws StreamException */
         return $this->handler->with(function () {
             $read = [$this->getOpenResource()];
             $write = $oob = [];
@@ -92,6 +93,7 @@ class SocketStream extends Stream
      * @param int<0, max>|float $timeout Seconds to be set.
      * @param int|null $microseconds Microseconds to be set - deprecated
      * @return bool If operation was succesful.
+     * @throws InvalidArgumentException if invalid timeout.
      * @throws StreamException if stream is closed.
      */
     public function setTimeout(int|float $timeout, int|null $microseconds = null): bool
@@ -124,6 +126,7 @@ class SocketStream extends Stream
         if (!$this->readable) {
             throw new StreamException(StreamException::NOT_READABLE);
         }
+        /** @throws StreamException */
         return $this->handler->with(function () use ($stream, $length) {
             $result = fgets($stream, $length);
             return $result === false ? null : $result;

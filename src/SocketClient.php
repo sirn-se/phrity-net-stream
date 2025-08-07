@@ -71,6 +71,7 @@ class SocketClient
      * Set timeout in seconds.
      * @param int<0, max>|float|null $timeout
      * @return SocketClient
+     * @throws InvalidArgumentException if invalid timeout
      */
     public function setTimeout(int|float|null $timeout): self
     {
@@ -87,10 +88,10 @@ class SocketClient
     /**
      * Create a connection on remote socket.
      * @return SocketStream The stream for opened conenction.
-     * @throws StreamException if connection could not be created
      */
     public function connect(): SocketStream
     {
+        /** @throws StreamException if connection could not be created */
         $stream = $this->handler->with(function () {
             $error_code = $error_message = '';
             return stream_socket_client(

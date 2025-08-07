@@ -106,6 +106,7 @@ class Stream implements StreamInterface, Stringable
      */
     public function tell(): int
     {
+        /** @throws StreamException */
         return $this->handler->with(function () {
             return ftell($this->getOpenResource());
         }, new StreamException(StreamException::FAIL_TELL));
@@ -135,6 +136,7 @@ class Stream implements StreamInterface, Stringable
         if (!$this->readable) {
             throw new StreamException(StreamException::NOT_READABLE);
         }
+        /** @throws StreamException */
         return $this->handler->with(function () use ($stream, $length) {
             return (string)fread($stream, $length);
         }, new StreamException(StreamException::FAIL_READ));
@@ -152,6 +154,7 @@ class Stream implements StreamInterface, Stringable
         if (!$this->writable) {
             throw new StreamException(StreamException::NOT_WRITABLE);
         }
+        /** @throws StreamException */
         return $this->handler->with(function () use ($stream, $string) {
             return fwrite($stream, $string);
         }, new StreamException(StreamException::FAIL_WRITE));
@@ -237,6 +240,7 @@ class Stream implements StreamInterface, Stringable
         if (!$this->readable) {
             throw new StreamException(StreamException::NOT_READABLE);
         }
+        /** @throws StreamException */
         return $this->handler->with(function () use ($stream) {
             return stream_get_contents($stream);
         }, new StreamException(StreamException::FAIL_CONTENTS));
