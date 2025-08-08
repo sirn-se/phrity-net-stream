@@ -76,7 +76,7 @@ class ContextTest extends TestCase
                     'test-option-1-2' => 'test-option-1-2-a',
                 ],
             ],
-            'notification' => 'test-notification-a',
+            'notification' => 'trim',
         ]);
         $context->setParams([
             'options' => [
@@ -85,9 +85,9 @@ class ContextTest extends TestCase
                     'test-option-1-3' => 'test-option-1-3-a',
                 ],
             ],
-            'notification' => 'test-notification-b',
+            'notification' => 'ltrim',
         ]);
-        $context->setParam('notification', 'test-notification-c');
+        $context->setParam('notification', 'rtrim');
         $context->setParam('options', [
             'test-wrapper-1' => [
                 'test-option-1-4' => 'test-option-1-4-a',
@@ -95,7 +95,7 @@ class ContextTest extends TestCase
         ]);
         $params = $context->getParams();
         $this->assertEquals([
-            'notification' => 'test-notification-c',
+            'notification' => 'rtrim',
             'options' => [
                 'test-wrapper-1' => [
                     'test-option-1-1' => 'test-option-1-1-b',
@@ -105,7 +105,7 @@ class ContextTest extends TestCase
                 ],
             ],
         ], $params);
-        $this->assertEquals('test-notification-c', $context->getParam('notification'));
+        $this->assertEquals('rtrim', $context->getParam('notification'));
     }
 
     public function testNotifiers(): void

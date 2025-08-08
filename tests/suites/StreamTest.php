@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Phrity\Net\Test;
 
+use ErrorException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Phrity\Net\{
@@ -349,10 +350,11 @@ class StreamTest extends TestCase
 
     public function testRemoteStream(): void
     {
-        $remote = fopen('https://phrity.sirn.se/', 'r');
-        if (!$remote) {
-            $this->markTestSkipped('Could not reach online research.');
-        }
+        $remote = (new ErrorHandler())->with(function () {
+            return fopen('https://phrity.sirn.se/', 'r');
+        }, function (ErrorException $exception) {
+            $this->markTestSkipped('Could not reach online resource.');
+        });
         $stream = new Stream($remote);
         $this->assertEquals('http', $stream->getMetadata('wrapper_type'));
         $this->assertEquals('tcp_socket/ssl', $stream->getMetadata('stream_type'));
@@ -377,10 +379,11 @@ class StreamTest extends TestCase
 
     public function testContext(): void
     {
-        $remote = fopen('https://phrity.sirn.se/', 'r');
-        if (!$remote) {
-            $this->markTestSkipped('Could not reach online research.');
-        }
+        $remote = (new ErrorHandler())->with(function () {
+            return fopen('https://phrity.sirn.se/', 'r');
+        }, function (ErrorException $exception) {
+            $this->markTestSkipped('Could not reach online resource.');
+        });
         $stream = new Stream($remote);
         $context = $stream->getContext();
         $this->assertInstanceOf(Context::class, $context);
@@ -390,10 +393,11 @@ class StreamTest extends TestCase
 
     public function testSeekOnRemoteError(): void
     {
-        $remote = fopen('https://phrity.sirn.se/', 'r');
-        if (!$remote) {
-            $this->markTestSkipped('Could not reach online research.');
-        }
+        $remote = (new ErrorHandler())->with(function () {
+            return fopen('https://phrity.sirn.se/', 'r');
+        }, function (ErrorException $exception) {
+            $this->markTestSkipped('Could not reach online resource.');
+        });
         $stream = new Stream($remote);
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::NOT_SEEKABLE);

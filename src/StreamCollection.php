@@ -104,7 +104,7 @@ class StreamCollection implements Countable, Iterator
      * Wait for redable content in stream collection.
      * @param int<0, max>|float $timeout Timeout in seconds.
      * @return self New collection instance.
-     * @throws StreamException If fails to select.
+     * @throws InvalidArgumentException If invalid timeout.
      */
     public function waitRead(int|float $timeout = 60): self
     {
