@@ -4,7 +4,6 @@ namespace Phrity\Net;
 
 use InvalidArgumentException;
 use Phrity\Util\ErrorHandler;
-use Psr\Http\Message\StreamInterface;
 use Stringable;
 use Throwable;
 

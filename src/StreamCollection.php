@@ -15,7 +15,7 @@ use Phrity\Util\ErrorHandler;
 class StreamCollection implements Countable, Iterator
 {
     protected ErrorHandler $handler;
-    /** @var array<string, Stream> */
+    /** @var array<string, StreamInterface> */
     private array $streams = [];
 
     /**
@@ -31,12 +31,12 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Attach stream to collection.
-     * @param Stream $attach Stream to attach.
+     * @param StreamInterface $attach Stream to attach.
      * @param string|null $key Definable name of stream.
      * @return string Name of stream.
      * @throws StreamException If already attached.
      */
-    public function attach(Stream $attach, string|null $key = null): string
+    public function attach(StreamInterface $attach, string|null $key = null): string
     {
         if ($key && array_key_exists($key, $this->streams)) {
             throw new StreamException(StreamException::COLLECT_KEY_CONFLICT, ['key' => $key]);
@@ -48,10 +48,10 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Detach stream from collection.
-     * @param Stream|string $detach Stream or name of stream  to detach.
+     * @param StreamInterface|string $detach Stream or name of stream to detach.
      * @return bool If a stream was detached.
      */
-    public function detach(Stream|string $detach): bool
+    public function detach(StreamInterface|string $detach): bool
     {
         if (is_string($detach)) {
             if (array_key_exists($detach, $this->streams)) {
@@ -157,9 +157,9 @@ class StreamCollection implements Countable, Iterator
 
     /**
      * Return the current stream.
-     * @return Stream|null Current stream.
+     * @return StreamInterface|null Current stream.
      */
-    public function current(): Stream|null
+    public function current(): StreamInterface|null
     {
         return current($this->streams) ?: null;
     }
