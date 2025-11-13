@@ -263,7 +263,7 @@ class Stream implements StreamInterface, Stringable
     }
 
 
-    // ---------- Extended methods ------------------------------------------------------------------------------------
+    // ---------- StreamInterface methods -----------------------------------------------------------------------------
 
     /**
      * Return context for stream.

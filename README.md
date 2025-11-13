@@ -17,6 +17,11 @@ Install with [Composer](https://getcomposer.org/);
 composer require phrity/net-stream
 ```
 
+## Interfaces
+
+* [StreamInterface](docs/StreamInterface.md) - Interface indicating a Stream implementation
+* [StreamContainerInterface](docs/StreamContainerInterface.md) - Interface indicating a class containg a Stream
+
 ## Included classes
 
 * [Stream](docs/Stream.md) - PSR-7 StreamFactory compatible Stream class
@@ -33,6 +38,7 @@ composer require phrity/net-stream
 
 | Version | PHP | |
 | --- | --- | --- |
+| `2.4` | `^8.1` | StreamInterface, StreamContainerInterface |
 | `2.3` | `^8.1` | Float timeout, hasContents method, Listeners |
 | `2.2` | `^8.1` | Improved context handling |
 | `2.1` | `^8.0` | Set context on server |

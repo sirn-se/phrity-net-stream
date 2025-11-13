@@ -29,7 +29,6 @@
         "psr/http-message": "^1.1 | ^2.0"
     },
     "require-dev": {
-        "php-coveralls/php-coveralls": "^2.0",
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^10.0 | ^11.0  | ^12.0",
         "phrity/net-uri": "^2.0",

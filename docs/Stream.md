@@ -43,7 +43,7 @@ class Stream implements StreamInterface, Stringable
 
     // Additional methods
 
-     // Get stream context
+    // StreamInterface methods
     public function getContext(): Context;
     public function getResource(): resource;
 }
