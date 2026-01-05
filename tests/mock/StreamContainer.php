@@ -20,4 +20,9 @@ class StreamContainer implements StreamContainerInterface
         $factory = new StreamFactory();
         return $factory->createStream('This is a temporary test stream');
     }
+
+    public function getIdentity(): string
+    {
+        return 'test-stream-container';
+    }
 }
