@@ -14,34 +14,34 @@ class StreamException extends RuntimeException
     use InterpolatorTrait;
 
     // Stream errors
-    public const int STREAM_DETACHED = 1000;
-    public const int NOT_READABLE = 1010;
-    public const int NOT_WRITABLE = 1011;
-    public const int NOT_SEEKABLE = 1012;
-    public const int FAIL_READ = 1020;
-    public const int FAIL_WRITE = 1021;
-    public const int FAIL_SEEK = 1022;
-    public const int FAIL_TELL = 1023;
-    public const int FAIL_CONTENTS = 1024;
-    public const int FAIL_GETS = 1025;
-    public const int FAIL_SELECT = 1026;
+    public const STREAM_DETACHED = 1000;
+    public const NOT_READABLE = 1010;
+    public const NOT_WRITABLE = 1011;
+    public const NOT_SEEKABLE = 1012;
+    public const FAIL_READ = 1020;
+    public const FAIL_WRITE = 1021;
+    public const FAIL_SEEK = 1022;
+    public const FAIL_TELL = 1023;
+    public const FAIL_CONTENTS = 1024;
+    public const FAIL_GETS = 1025;
+    public const FAIL_SELECT = 1026;
 
     // Client errors
-    public const int CLIENT_CONNECT_ERR = 2000;
+    public const CLIENT_CONNECT_ERR = 2000;
 
     // Server errors
-    public const int SCHEME_TRANSPORT = 3000;
-    public const int SCHEME_HANDLER = 3001;
-    public const int SERVER_SOCKET_ERR = 3010;
-    public const int SERVER_CLOSED = 3011;
-    public const int SERVER_ACCEPT_ERR = 3012;
+    public const SCHEME_TRANSPORT = 3000;
+    public const SCHEME_HANDLER = 3001;
+    public const SERVER_SOCKET_ERR = 3010;
+    public const SERVER_CLOSED = 3011;
+    public const SERVER_ACCEPT_ERR = 3012;
 
     // Collection errors
-    public const int COLLECT_KEY_CONFLICT = 4000;
-    public const int COLLECT_SELECT_ERR = 4001;
+    public const COLLECT_KEY_CONFLICT = 4000;
+    public const COLLECT_SELECT_ERR = 4001;
 
     // Context errors
-    public const int CONTEXT_SET_ERR = 5000;
+    public const CONTEXT_SET_ERR = 5000;
 
     /** @var array<int, string> */
     private static array $messages = [
@@ -70,7 +70,7 @@ class StreamException extends RuntimeException
     /**
      * Create exception.
      * @param int $code Error code
-     * @param array<string, scalar> $data Additional data
+     * @param array<string, mixed> $data Additional data
      * @param Throwable|null $previous Previous exception
      */
     public function __construct(int $code, array $data = [], Throwable|null $previous = null)
