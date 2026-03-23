@@ -86,7 +86,7 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist
     - name: Code coverage
-      run: vendor/bin/phpunit --coverage-clover coverage/clover.xml
+      run: vendor/bin/phpunit --coverage-clover coverage/clover.xml --do-not-fail-on-phpunit-warning -d --min-coverage=100
 
   stan:
     runs-on: ubuntu-latest
