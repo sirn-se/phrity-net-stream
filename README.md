@@ -1,7 +1,6 @@
 <p align="center"><img src="docs/logotype.png" alt="Phrity Net Stream" width="100%"></p>
 
 [![Build Status](https://github.com/sirn-se/phrity-net-stream/actions/workflows/acceptance.yml/badge.svg)](https://github.com/sirn-se/phrity-net-stream/actions)
-[![Coverage Status](https://coveralls.io/repos/github/sirn-se/phrity-net-stream/badge.svg?branch=main)](https://coveralls.io/github/sirn-se/phrity-net-stream?branch=main)
 
 # Introduction
 
@@ -24,14 +23,14 @@ composer require phrity/net-stream
 
 ## Included classes
 
-* [Stream](docs/Stream.md) - PSR-7 StreamFactory compatible Stream class
-* [SocketStream](docs/SocketStream.md) - Extending Stream for additional methods
+* [Context](docs/Context.md) - Stream context wrapper class
 * [SocketClient](docs/SocketClient.md) - Socket Client that creates SocketStream connections
 * [SocketServer](docs/SocketServer.md) - Socket Server that creates SocketStream connections
+* [SocketStream](docs/SocketStream.md) - Extending Stream for additional methods
+* [Stream](docs/Stream.md) - PSR-7 StreamFactory compatible Stream class
 * [StreamCollection](docs/StreamCollection.md) - Collection of connections
-* [StreamFactory](docs/StreamFactory.md) - PSR-17 StreamFactoryInterface compatible factory
 * [StreamException](docs/StreamException.md) - Exception for stream related errors
-* [Context](docs/Context.md) - Context wrapper fro streams
+* [StreamFactory](docs/StreamFactory.md) - PSR-17 StreamFactoryInterface compatible factory
 
 
 ## Versions

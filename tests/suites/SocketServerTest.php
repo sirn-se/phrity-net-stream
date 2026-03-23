@@ -130,7 +130,9 @@ class SocketServerTest extends TestCase
         ], $server->getMetadata());
         $this->expectException(StreamException::class);
         $this->expectExceptionCode(StreamException::SERVER_ACCEPT_ERR);
-        $this->expectExceptionMessage('Could not accept on socket.');
+        $this->expectExceptionMessageMatches(
+            '/Could not accept on socket\. \(stream_socket_accept\(\):.*timed out.*\)/i'
+        );
         $stream = $server->accept(0);
         $server->close();
     }
