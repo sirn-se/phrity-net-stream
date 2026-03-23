@@ -7,7 +7,7 @@ use InvalidArgumentException;
 /**
  * SocketStream class.
  */
-class SocketStream extends Stream implements StreamInterface
+class SocketStream extends Stream
 {
     // ---------- Configuration ---------------------------------------------------------------------------------------
 
