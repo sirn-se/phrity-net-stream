@@ -17,6 +17,7 @@ use Phrity\Net\{
     StreamCollection,
     StreamException
 };
+use Phrity\Net\Test\StreamContainer;
 use Phrity\Net\Uri;
 use TypeError;
 
@@ -69,6 +70,24 @@ class StreamCollectionTest extends TestCase
         /* @phpstan-ignore method.alreadyNarrowedType */
         $this->assertIsString($collection->attach($stream));
         $this->assertCount(1, $collection);
+    }
+
+    public function testContainer(): void
+    {
+        $container = new StreamContainer();
+        $collection = new StreamCollection();
+        $this->assertEquals('@container', $collection->attach($container, '@container'));
+
+        $this->assertCount(1, $collection);
+        foreach ($collection as $key => $item) {
+            $this->assertSame($container, $item);
+        }
+        foreach ($collection->getReadable() as $key => $item) {
+            $this->assertSame($container, $item);
+        }
+        foreach ($collection->getWritable() as $key => $item) {
+            $this->assertSame($container, $item);
+        }
     }
 
     public function testInvalidTimeout(): void
